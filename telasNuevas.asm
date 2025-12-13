@@ -97,6 +97,12 @@ seAcaba:
 CAMBIAR_USUARIO:
     CALL BORRAR_FICHA1
     CALL Animacion_Caeficha
+    
+    ; Comprobar si hay 4 en raya (Caracter = 'F') y salir inmediatamente
+    ld a, (Caracter)
+    cp 'F'
+    ret z                  ; Si hay 4 en raya, salir sin cambiar usuario
+    
     ld a,(ColumnaFull);comprobamos si la columna ha estado llena
     cp 1
     jp z, nohaycambio

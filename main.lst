@@ -108,9 +108,9 @@
  66   9BF9 3E B0               LD A, 6*8+128
  67   9BFB 32 90 5A            LD ($5800+20*32+16), A
  68   9BFE
- 69   9BFE CD 32 A5            CALL LEER_SN
+ 69   9BFE CD 33 A6            CALL LEER_SN
  70   9C01 20 34               JR NZ, fin
- 71   9C03 CD DE A4            CALL JUEGO ;al salir la primera vez con F baja a jugar nuevamente.
+ 71   9C03 CD FB A4            CALL JUEGO ;al salir la primera vez con F baja a jugar nuevamente.
  72   9C06
  73   9C06              JUGAR_NUEVAMENTE:  ; empieza limpiando e imprimiendo los dos textos de la pantalla
  74   9C06 3E 00               LD A, 0
@@ -129,10 +129,10 @@
  87   9C24 CD 38 9C            CALL PRINTAT
  88   9C27 3E B0               LD A, 6*8+128
  89   9C29 32 9E 59            LD ($5800+12*32+30), A
- 90   9C2C CD 32 A5            CALL LEER_SN     ; hace la funcion nuevamente de la pantalla inicial
+ 90   9C2C CD 33 A6            CALL LEER_SN     ; hace la funcion nuevamente de la pantalla inicial
  91   9C2F 20 06               JR NZ, fin
  92   9C31
- 93   9C31 CD DE A4            CALL JUEGO
+ 93   9C31 CD FB A4            CALL JUEGO
  94   9C34 C3 06 9C            JP JUGAR_NUEVAMENTE
  95   9C37              fin:
  96   9C37 76                  HALT
@@ -887,400 +887,616 @@
 430+  A332 C1                   POP BC
 431+  A333 C9                   RET
 432+  A334
-433+  A334              Animacion_Caeficha:
-434+  A334
-435+  A334 AF                   xor a
-436+  A335 32 72 9B             ld (ColumnaFull), a
-437+  A338
-438+  A338 7D                   ld a, l                ; A columna (0-6)
-439+  A339 DD 21 9F 9B          ld ix, Posiciones1     ; IX = inicio del tablero
-440+  A33D 3C                   inc a                  ; +1 por el $ff
-441+  A33E 5F                   ld e, a
-442+  A33F 16 00                ld d, 0
-443+  A341 DD 19                add ix, de             ; IX = Posiciones1 +1 + columna
-444+  A343
-445+  A343 11 2D 00             ld de, 9*5             ; 45 bytes, ultima fila
-446+  A346 DD 19                add ix, de             ; IX apunta a ultima fila
-447+  A348
-448+  A348 06 06                ld b, 6                ; 6 filas (5..0)
-449+  A34A 11 F7 FF             ld de, -9              ; salto hacia arriba una fila
-450+  A34D
-451+  A34D              BuscarHueco:
-452+  A34D DD 7E 00             ld a, (ix)
-453+  A350 FE 00                cp 0
-454+  A352 28 06                jr z, HuecoEncontrado
-455+  A354
-456+  A354 DD 19                add ix, de             ; subir 1 fila
-457+  A356 10 F5                djnz BuscarHueco
-458+  A358
-459+  A358 18 1D                jr ColumnaLlena
-460+  A35A
-461+  A35A              HuecoEncontrado:
-462+  A35A
-463+  A35A                      ; Guardamos color
-464+  A35A 3A 74 9B             ld a, (Color_Usuario)
-465+  A35D DD 77 00             ld (ix), a
-466+  A360
-467+  A360                      ; B vale filas probadas
-468+  A360 48                   ld c, b                ; C = veces que cae
-469+  A361 26 00                ld h, 0                ; empezar caida desde encima del tablero
-470+  A363
-471+  A363              bucle_Cae:
-472+  A363 24                   inc H
-473+  A364 CD 7D A3             call PintaCuadrao1
-474+  A367 CD B8 A3             call ESPERAR
-475+  A36A 0D                   dec c
-476+  A36B 28 05                jr z, TerminaAnimacion
-477+  A36D CD 8D A3             call BORRAR_FICHA1
-478+  A370 18 F1                jr bucle_Cae
-479+  A372              TerminaAnimacion:
-480+  A372 AF                   xor a
-481+  A373 32 72 9B             ld (ColumnaFull), a
-482+  A376 C9                   ret
-483+  A377              ColumnaLlena:
-484+  A377 3E 01                ld a, 1
-485+  A379 32 72 9B             ld (ColumnaFull),a
-486+  A37C C9                   ret
-487+  A37D              PintaCuadrao1:;coge hl externo, DE 0-6 EN H (FILA) Y L (COLUMNA) CALCULA COORD Y PINTA
-488+  A37D
-489+  A37D 7C                   LD A, H
-490+  A37E B7                   OR A
-491+  A37F 28 07                JR Z, COLOR_SUPERIOR
-492+  A381 3A 74 9B             LD A, (Color_Usuario)
-493+  A384 F6 08                OR PAPEL_Azul
-494+  A386 18 0E                JR SEGUIR1
-495+  A388              COLOR_SUPERIOR:
-496+  A388 3A 74 9B             LD A, (Color_Usuario)
-497+  A38B 18 09                JR SEGUIR1
-498+  A38D              BORRAR_FICHA1:
-499+  A38D 7C                   LD A, H ;compruebo si es arriba del tablero(h=0)
-500+  A38E B7                   OR A
-501+  A38F 28 04                JR Z, BORRAR_SUPERIOR
-502+  A391 3E 08                LD A, PAPEL_Azul + TINTA_Blck
-503+  A393 18 01                JR SEGUIR1
-504+  A395              BORRAR_SUPERIOR:
-505+  A395 AF                   XOR A
-506+  A396              SEGUIR1:
-507+  A396 E5                   PUSH HL
-508+  A397 F5                   PUSH AF
-509+  A398 F5                   PUSH AF
-510+  A399 7C                   LD A, H  ; H= H*3 +1 "abajo"
-511+  A39A 84                   ADD A, H
-511+  A39B 84            ADD A, H
-512+  A39C 3C                   INC A
-513+  A39D 67                   LD H,A
-514+  A39E 7D                   LD A,L ; L = L*4 +1 "derecha"
-515+  A39F 85                   ADD A,L
-516+  A3A0 87                   ADD A,A
-517+  A3A1 3C                   INC A
-518+  A3A2 6F                   LD L,A
-519+  A3A3 CD 11 A5             CALL SlotPointer ;HL>$5800
-520+  A3A6 F1                   POP AF
-521+  A3A7 77                   LD (HL), A
-522+  A3A8 23                   INC HL
-523+  A3A9 77                   LD (HL), A
-524+  A3AA 23                   INC HL
-525+  A3AB 77                   LD (HL), A
-526+  A3AC 11 20 00             LD DE,32
-527+  A3AF 19                   ADD HL,DE
-528+  A3B0 77                   LD (HL), A
-529+  A3B1 2B                   DEC HL
-530+  A3B2 77                   LD (HL),A
-531+  A3B3 2B                   DEC HL
-532+  A3B4 77                   LD (HL), A
-533+  A3B5
-534+  A3B5 F1                   POP AF
-535+  A3B6 E1                   POP HL
-536+  A3B7 C9                   RET
-537+  A3B8              ESPERAR:
-538+  A3B8 C5                   push bc
-539+  A3B9 06 32                LD B,50
-540+  A3BB 0E FF        D1:     LD C, 255
-541+  A3BD 0D           D2:     DEC C
-542+  A3BE 20 FD                JR NZ,D2
-543+  A3C0 10 F9                DJNZ D1
-544+  A3C2 C1                   pop bc
-545+  A3C3 C9                   RET
-546+  A3C4
-547+  A3C4
+433+  A334              ; Variables para guardar posicion final de la ficha (usadas por Comprobar4enraya)
+434+  A334 00           ColumnaFinal: db 0              ; Columna donde cayo la ficha (0-6)
+435+  A335 00           FilaFinal:    db 0              ; Fila donde cayo la ficha (0-5)
+436+  A336
+437+  A336              Animacion_Caeficha:
+438+  A336
+439+  A336 AF                   xor a
+440+  A337 32 72 9B             ld (ColumnaFull), a
+441+  A33A
+442+  A33A                      ; GUARDAMOS LA COLUMNA para usarla despues en Comprobar4enraya
+443+  A33A 7D                   ld a, l                ; A columna (0-6)
+444+  A33B 32 34 A3             ld (ColumnaFinal), a   ; Guardar columna para despues
+445+  A33E
+446+  A33E DD 21 9F 9B          ld ix, Posiciones1     ; IX = inicio del tablero
+447+  A342 3C                   inc a                  ; +1 por el $ff
+448+  A343 5F                   ld e, a
+449+  A344 16 00                ld d, 0
+450+  A346 DD 19                add ix, de             ; IX = Posiciones1 +1 + columna
+451+  A348
+452+  A348 11 2D 00             ld de, 9*5             ; 45 bytes, ultima fila
+453+  A34B DD 19                add ix, de             ; IX apunta a ultima fila
+454+  A34D
+455+  A34D 06 06                ld b, 6                ; 6 filas (5..0)
+456+  A34F 11 F7 FF             ld de, -9              ; salto hacia arriba una fila
+457+  A352
+458+  A352              BuscarHueco:
+459+  A352 DD 7E 00             ld a, (ix)
+460+  A355 FE 00                cp 0
+461+  A357 28 06                jr z, HuecoEncontrado
+462+  A359
+463+  A359 DD 19                add ix, de             ; subir 1 fila
+464+  A35B 10 F5                djnz BuscarHueco
+465+  A35D
+466+  A35D 18 2F                jr ColumnaLlena
+467+  A35F
+468+  A35F              HuecoEncontrado:
+469+  A35F
+470+  A35F                      ; Guardamos color
+471+  A35F 3A 74 9B             ld a, (Color_Usuario)
+472+  A362 DD 77 00             ld (ix), a
+473+  A365
+474+  A365                      ; CALCULAMOS Y GUARDAMOS LA FILA FINAL
+475+  A365                      ; B=6 -> fila 5, B=5 -> fila 4, ..., B=1 -> fila 0
+476+  A365                      ; Fila = B - 1
+477+  A365 78                   ld a, b
+478+  A366 3D                   dec a
+479+  A367 32 35 A3             ld (FilaFinal), a      ; Guardar fila para Comprobar4enraya
+480+  A36A
+481+  A36A                      ; B vale filas probadas
+482+  A36A 48                   ld c, b                ; C = veces que cae
+483+  A36B 26 00                ld h, 0                ; empezar caida desde encima del tablero
+484+  A36D
+485+  A36D              bucle_Cae:
+486+  A36D 24                   inc H
+487+  A36E CD 94 A3             call PintaCuadrao1
+488+  A371 CD CF A3             call ESPERAR
+489+  A374 0D                   dec c
+490+  A375 28 05                jr z, TerminaAnimacion
+491+  A377 CD A4 A3             call BORRAR_FICHA1
+492+  A37A 18 F1                jr bucle_Cae
+493+  A37C              TerminaAnimacion:
+494+  A37C AF                   xor a
+495+  A37D 32 72 9B             ld (ColumnaFull), a
+496+  A380                      ; Cargar fila y columna guardadas para Comprobar4enraya
+497+  A380                      ; H = fila (0-5), L = columna (0-6)
+498+  A380 E5                   push hl                ; Guardar HL actual
+499+  A381 3A 35 A3             ld a, (FilaFinal)
+500+  A384 67                   ld h, a
+501+  A385 3A 34 A3             ld a, (ColumnaFinal)
+502+  A388 6F                   ld l, a
+503+  A389 CD 77 A5             call Comprobar4enraya
+504+  A38C E1                   pop hl                 ; Restaurar HL
+505+  A38D C9                   ret
+506+  A38E              ColumnaLlena:
+507+  A38E 3E 01                ld a, 1
+508+  A390 32 72 9B             ld (ColumnaFull),a
+509+  A393 C9                   ret
+510+  A394              PintaCuadrao1:;coge hl externo, DE 0-6 EN H (FILA) Y L (COLUMNA) CALCULA COORD Y PINTA
+511+  A394
+512+  A394 7C                   LD A, H
+513+  A395 B7                   OR A
+514+  A396 28 07                JR Z, COLOR_SUPERIOR
+515+  A398 3A 74 9B             LD A, (Color_Usuario)
+516+  A39B F6 08                OR PAPEL_Azul
+517+  A39D 18 0E                JR SEGUIR1
+518+  A39F              COLOR_SUPERIOR:
+519+  A39F 3A 74 9B             LD A, (Color_Usuario)
+520+  A3A2 18 09                JR SEGUIR1
+521+  A3A4              BORRAR_FICHA1:
+522+  A3A4 7C                   LD A, H ;compruebo si es arriba del tablero(h=0)
+523+  A3A5 B7                   OR A
+524+  A3A6 28 04                JR Z, BORRAR_SUPERIOR
+525+  A3A8 3E 08                LD A, PAPEL_Azul + TINTA_Blck
+526+  A3AA 18 01                JR SEGUIR1
+527+  A3AC              BORRAR_SUPERIOR:
+528+  A3AC AF                   XOR A
+529+  A3AD              SEGUIR1:
+530+  A3AD E5                   PUSH HL
+531+  A3AE F5                   PUSH AF
+532+  A3AF F5                   PUSH AF
+533+  A3B0 7C                   LD A, H  ; H= H*3 +1 "abajo"
+534+  A3B1 84                   ADD A, H
+534+  A3B2 84            ADD A, H
+535+  A3B3 3C                   INC A
+536+  A3B4 67                   LD H,A
+537+  A3B5 7D                   LD A,L ; L = L*4 +1 "derecha"
+538+  A3B6 85                   ADD A,L
+539+  A3B7 87                   ADD A,A
+540+  A3B8 3C                   INC A
+541+  A3B9 6F                   LD L,A
+542+  A3BA CD FD A5             CALL SlotPointer ;HL>$5800
+543+  A3BD F1                   POP AF
+544+  A3BE 77                   LD (HL), A
+545+  A3BF 23                   INC HL
+546+  A3C0 77                   LD (HL), A
+547+  A3C1 23                   INC HL
+548+  A3C2 77                   LD (HL), A
+549+  A3C3 11 20 00             LD DE,32
+550+  A3C6 19                   ADD HL,DE
+551+  A3C7 77                   LD (HL), A
+552+  A3C8 2B                   DEC HL
+553+  A3C9 77                   LD (HL),A
+554+  A3CA 2B                   DEC HL
+555+  A3CB 77                   LD (HL), A
+556+  A3CC
+557+  A3CC F1                   POP AF
+558+  A3CD E1                   POP HL
+559+  A3CE C9                   RET
+560+  A3CF              ESPERAR:
+561+  A3CF C5                   push bc
+562+  A3D0 06 32                LD B,50
+563+  A3D2 0E FF        D1:     LD C, 255
+564+  A3D4 0D           D2:     DEC C
+565+  A3D5 20 FD                JR NZ,D2
+566+  A3D7 10 F9                DJNZ D1
+567+  A3D9 C1                   pop bc
+568+  A3DA C9                   RET
+569+  A3DB
+570+  A3DB
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\pintaficha1.asm
-102   A3C4                      INCLUDE "telasNuevas.asm"
+102   A3DB                      INCLUDE "telasNuevas.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\telasNuevas.asm
-  1+  A3C4              ;funciones al leer una tecla válida(excepto F que hace que salga):
-  2+  A3C4              MOVER_DERECHA:
-  3+  A3C4 CD 8D A3         CALL BORRAR_FICHA1
-  4+  A3C7 2C               INC L
-  5+  A3C8 7D               LD A, L
-  6+  A3C9 FE 06            CP POS_MAX1
-  7+  A3CB 28 04            JR Z, DIBUJA_DCHA
-  8+  A3CD 38 02            JR C, DIBUJA_DCHA
-  9+  A3CF              SALTO_FINAL:
- 10+  A3CF 2E 00            LD L, 0
- 11+  A3D1              DIBUJA_DCHA:
- 12+  A3D1 CD 7D A3         CALL PintaCuadrao1
- 13+  A3D4 C9               RET
- 14+  A3D5
- 15+  A3D5
- 16+  A3D5              MOVER_IZQUIERDA:
- 17+  A3D5 CD 8D A3         CALL BORRAR_FICHA1
- 18+  A3D8 7D               LD A, L
- 19+  A3D9 FE 00            CP POS_MIN1
- 20+  A3DB 28 07            JR Z, SALTO_INICIO
- 21+  A3DD 38 05            JR C, SALTO_INICIO
- 22+  A3DF 2D               DEC L
- 23+  A3E0 CD 7D A3         CALL PintaCuadrao1
- 24+  A3E3 C9               RET
- 25+  A3E4              SALTO_INICIO:
- 26+  A3E4 2E 06            LD L, POS_MAX1
- 27+  A3E6 CD 7D A3         CALL PintaCuadrao1
- 28+  A3E9 C9               RET
- 29+  A3EA
- 30+  A3EA              ;función principal---------------------------------
- 31+  A3EA              ES_AMARILLOYNolocambio:
- 32+  A3EA CD 7D A3         CALL PintaCuadrao1
- 33+  A3ED              TECLAS: ; CAMBIA A
- 34+  A3ED C5               PUSH BC
- 35+  A3EE
- 36+  A3EE              L15:
- 37+  A3EE 01 FE FB         LD BC,$FBFE
- 38+  A3F1 ED 78            IN A,(C)
- 39+  A3F3 CB 47            BIT 0,A
- 40+  A3F5 20 0D            JR NZ,L16
- 41+  A3F7 CD 29 A5         CALL SOLTAR_TECLA
- 42+  A3FA 3E 51            LD A,'Q'
- 43+  A3FC 32 73 9B         LD (Caracter),A
- 44+  A3FF C1               POP BC
- 45+  A400 CD D5 A3         CALL MOVER_IZQUIERDA
- 46+  A403 C9               RET
- 47+  A404              L16:
- 48+  A404 CB 4F            BIT 1,A
- 49+  A406 20 0D            JR NZ,L17
- 50+  A408 CD 29 A5         CALL SOLTAR_TECLA
- 51+  A40B 3E 57            LD A,'W'
- 52+  A40D 32 73 9B         LD (Caracter),A
- 53+  A410 C1               POP BC
- 54+  A411 CD C4 A3         CALL MOVER_DERECHA
- 55+  A414 C9               RET
- 56+  A415
- 57+  A415
- 58+  A415              L17:
- 59+  A415 01 FE FD         LD BC,$FDFE
- 60+  A418 ED 78            IN A,(C)
- 61+  A41A CB 5F            BIT 3,A
- 62+  A41C 20 0A            JR NZ,L5
- 63+  A41E CD 29 A5         CALL SOLTAR_TECLA
- 64+  A421 3E 46            LD A,'F'
- 65+  A423 32 73 9B         LD (Caracter),A
- 66+  A426 C1               POP BC
- 67+  A427 C9               RET
- 68+  A428              L5:                     ; Este cambia porque es RETURN y se carga como carácter $FF
- 69+  A428 01 FE BF         LD BC,$BFFE
- 70+  A42B ED 78            IN A,(C)
- 71+  A42D CB 47            BIT 0,A
- 72+  A42F 20 BD            JR NZ,L15
- 73+  A431 CD 29 A5         CALL SOLTAR_TECLA
- 74+  A434 3E FF            LD A,$FF
- 75+  A436 32 73 9B         LD (Caracter),A
- 76+  A439 C1               POP BC
- 77+  A43A 18 1D            jr CAMBIAR_USUARIO
- 78+  A43C
- 79+  A43C
- 80+  A43C              ;cambio de usuario y lectura de movimiento con o-p
- 81+  A43C              ES_ROJO:
- 82+  A43C CD F3 A4         CALL Tablero_lleno
- 83+  A43F 3A 71 9B         ld a, (FullTablero)
- 84+  A442 FE 01            cp 1
- 85+  A444 28 0D            jr z, seAcaba
- 86+  A446 3E 06            LD A, TINTA_Yel          ; cambiar a amarillo (sin papel)
- 87+  A448 32 74 9B         LD (Color_Usuario), A
- 88+  A44B 26 00            LD H,0    ; Restaurar posición inicial
- 89+  A44D 2E 00            LD L,0
- 90+  A44F CD 7D A3         CALL PintaCuadrao1
- 91+  A452 C9               RET
- 92+  A453              seAcaba:
- 93+  A453 3E 46            ld a, "F"
- 94+  A455 32 73 9B         ld(Caracter), A
- 95+  A458 C9               ret
- 96+  A459
- 97+  A459              CAMBIAR_USUARIO:
- 98+  A459 CD 8D A3         CALL BORRAR_FICHA1
- 99+  A45C CD 34 A3         CALL Animacion_Caeficha
-100+  A45F 3A 72 9B         ld a,(ColumnaFull);comprobamos si la columna ha estado llena
-101+  A462 FE 01            cp 1
-102+  A464 CA CF A4         jp z, nohaycambio
-103+  A467 3A 74 9B         LD A, (Color_Usuario)   ; carga el color actual
-104+  A46A FE 06            CP TINTA_Yel            ; comparo con amarillo
-105+  A46C 20 CE            JR NZ, ES_ROJO          ; si es amarillo se cambia a rojo
-106+  A46E 3E 02            LD A, TINTA_Red         ; cambiar a rojo (sin papel)
-107+  A470 32 74 9B         LD (Color_Usuario), A
-108+  A473 26 00            LD H,0
-109+  A475 2E 00            ld L,0    ; Restaurar posición inicial
-110+  A477              ES_ROJOYNolocambio:
-111+  A477 CD 7D A3         CALL PintaCuadrao1
-112+  A47A              L21:
-113+  A47A C5               PUSH BC                 ; Guardar BC al inicio del bucle
-114+  A47B 01 FE DF         LD BC,$DFFE
-115+  A47E ED 78            IN A,(C)
-116+  A480 CB 47            BIT 0,A
-117+  A482 20 0E            JR NZ,L22
-118+  A484 CD 29 A5         CALL SOLTAR_TECLA
-119+  A487 3E 50            LD A,'P'
-120+  A489 32 73 9B         LD (Caracter),A
-121+  A48C C1               POP BC
-122+  A48D CD C4 A3         CALL MOVER_DERECHA
-123+  A490 18 E8            jr L21
-124+  A492              L22:
-125+  A492 CB 4F            BIT 1,A
-126+  A494 20 0E            JR NZ,L23
-127+  A496 CD 29 A5         CALL SOLTAR_TECLA
-128+  A499 3E 4F            LD A,'O'
-129+  A49B 32 73 9B         LD (Caracter),A
-130+  A49E C1               POP BC
-131+  A49F CD D5 A3         CALL MOVER_IZQUIERDA
-132+  A4A2 18 D6            jr L21
-133+  A4A4              L23:
-134+  A4A4 01 FE FD         LD BC,$FDFE
-135+  A4A7 ED 78            IN A,(C)
-136+  A4A9 CB 5F            BIT 3,A
-137+  A4AB 20 0A            JR NZ,L24
-138+  A4AD CD 29 A5         CALL SOLTAR_TECLA
-139+  A4B0 3E 46            LD A,'F'
-140+  A4B2 32 73 9B         LD (Caracter),A
-141+  A4B5 C1               POP BC
-142+  A4B6 C9               RET
-143+  A4B7              L24:                     ; Este cambia porque es RETURN y se carga como carácter $FF
-144+  A4B7 01 FE BF         LD BC,$BFFE
-145+  A4BA ED 78            IN A,(C)
-146+  A4BC CB 47            BIT 0,A
-147+  A4BE 20 0B            JR NZ,L25
-148+  A4C0 CD 29 A5         CALL SOLTAR_TECLA
-149+  A4C3 3E FF            LD A,$FF
-150+  A4C5 32 73 9B         LD (Caracter),A
-151+  A4C8 C1               POP BC
-152+  A4C9 18 8E            jr CAMBIAR_USUARIO
-153+  A4CB              L25:
-154+  A4CB C1               POP BC              ; Limpiar stack si no se presionó ninguna tecla
-155+  A4CC 18 AC            jr L21
-156+  A4CE
-157+  A4CE C9               RET
-158+  A4CF              nohaycambio:
-159+  A4CF AF               xor a
-160+  A4D0 32 72 9B         ld (ColumnaFull), a
-161+  A4D3 3A 74 9B         LD A, (Color_Usuario)   ; carga el color actual
-162+  A4D6 FE 06            CP TINTA_Yel            ; comparo con amarillo
-163+  A4D8 C2 77 A4         JP NZ, ES_ROJOYNolocambio
-164+  A4DB C3 EA A3         JP ES_AMARILLOYNolocambio
+  1+  A3DB              ;funciones al leer una tecla válida(excepto F que hace que salga):
+  2+  A3DB              MOVER_DERECHA:
+  3+  A3DB CD A4 A3         CALL BORRAR_FICHA1
+  4+  A3DE 2C               INC L
+  5+  A3DF 7D               LD A, L
+  6+  A3E0 FE 06            CP POS_MAX1
+  7+  A3E2 28 04            JR Z, DIBUJA_DCHA
+  8+  A3E4 38 02            JR C, DIBUJA_DCHA
+  9+  A3E6              SALTO_FINAL:
+ 10+  A3E6 2E 00            LD L, 0
+ 11+  A3E8              DIBUJA_DCHA:
+ 12+  A3E8 CD 94 A3         CALL PintaCuadrao1
+ 13+  A3EB C9               RET
+ 14+  A3EC
+ 15+  A3EC
+ 16+  A3EC              MOVER_IZQUIERDA:
+ 17+  A3EC CD A4 A3         CALL BORRAR_FICHA1
+ 18+  A3EF 7D               LD A, L
+ 19+  A3F0 FE 00            CP POS_MIN1
+ 20+  A3F2 28 07            JR Z, SALTO_INICIO
+ 21+  A3F4 38 05            JR C, SALTO_INICIO
+ 22+  A3F6 2D               DEC L
+ 23+  A3F7 CD 94 A3         CALL PintaCuadrao1
+ 24+  A3FA C9               RET
+ 25+  A3FB              SALTO_INICIO:
+ 26+  A3FB 2E 06            LD L, POS_MAX1
+ 27+  A3FD CD 94 A3         CALL PintaCuadrao1
+ 28+  A400 C9               RET
+ 29+  A401
+ 30+  A401              ;función principal---------------------------------
+ 31+  A401              ES_AMARILLOYNolocambio:
+ 32+  A401 CD 94 A3         CALL PintaCuadrao1
+ 33+  A404              TECLAS: ; CAMBIA A
+ 34+  A404 C5               PUSH BC
+ 35+  A405
+ 36+  A405              L15:
+ 37+  A405 01 FE FB         LD BC,$FBFE
+ 38+  A408 ED 78            IN A,(C)
+ 39+  A40A CB 47            BIT 0,A
+ 40+  A40C 20 0D            JR NZ,L16
+ 41+  A40E CD 2A A6         CALL SOLTAR_TECLA
+ 42+  A411 3E 51            LD A,'Q'
+ 43+  A413 32 73 9B         LD (Caracter),A
+ 44+  A416 C1               POP BC
+ 45+  A417 CD EC A3         CALL MOVER_IZQUIERDA
+ 46+  A41A C9               RET
+ 47+  A41B              L16:
+ 48+  A41B CB 4F            BIT 1,A
+ 49+  A41D 20 0D            JR NZ,L17
+ 50+  A41F CD 2A A6         CALL SOLTAR_TECLA
+ 51+  A422 3E 57            LD A,'W'
+ 52+  A424 32 73 9B         LD (Caracter),A
+ 53+  A427 C1               POP BC
+ 54+  A428 CD DB A3         CALL MOVER_DERECHA
+ 55+  A42B C9               RET
+ 56+  A42C
+ 57+  A42C
+ 58+  A42C              L17:
+ 59+  A42C 01 FE FD         LD BC,$FDFE
+ 60+  A42F ED 78            IN A,(C)
+ 61+  A431 CB 5F            BIT 3,A
+ 62+  A433 20 0A            JR NZ,L5
+ 63+  A435 CD 2A A6         CALL SOLTAR_TECLA
+ 64+  A438 3E 46            LD A,'F'
+ 65+  A43A 32 73 9B         LD (Caracter),A
+ 66+  A43D C1               POP BC
+ 67+  A43E C9               RET
+ 68+  A43F              L5:                     ; Este cambia porque es RETURN y se carga como carácter $FF
+ 69+  A43F 01 FE BF         LD BC,$BFFE
+ 70+  A442 ED 78            IN A,(C)
+ 71+  A444 CB 47            BIT 0,A
+ 72+  A446 20 BD            JR NZ,L15
+ 73+  A448 CD 2A A6         CALL SOLTAR_TECLA
+ 74+  A44B 3E FF            LD A,$FF
+ 75+  A44D 32 73 9B         LD (Caracter),A
+ 76+  A450 C1               POP BC
+ 77+  A451 18 1D            jr CAMBIAR_USUARIO
+ 78+  A453
+ 79+  A453
+ 80+  A453              ;cambio de usuario y lectura de movimiento con o-p
+ 81+  A453              ES_ROJO:
+ 82+  A453 CD 59 A5         CALL Tablero_lleno
+ 83+  A456 3A 71 9B         ld a, (FullTablero)
+ 84+  A459 FE 01            cp 1
+ 85+  A45B 28 0D            jr z, seAcaba
+ 86+  A45D 3E 06            LD A, TINTA_Yel          ; cambiar a amarillo (sin papel)
+ 87+  A45F 32 74 9B         LD (Color_Usuario), A
+ 88+  A462 26 00            LD H,0    ; Restaurar posición inicial
+ 89+  A464 2E 00            LD L,0
+ 90+  A466 CD 94 A3         CALL PintaCuadrao1
+ 91+  A469 C9               RET
+ 92+  A46A              seAcaba:
+ 93+  A46A 3E 46            ld a, "F"
+ 94+  A46C 32 73 9B         ld(Caracter), A
+ 95+  A46F C9               ret
+ 96+  A470
+ 97+  A470              CAMBIAR_USUARIO:
+ 98+  A470 CD A4 A3         CALL BORRAR_FICHA1
+ 99+  A473 CD 36 A3         CALL Animacion_Caeficha
+100+  A476
+101+  A476                  ; Comprobar si hay 4 en raya (Caracter = 'F') y salir inmediatamente
+102+  A476 3A 73 9B         ld a, (Caracter)
+103+  A479 FE 46            cp 'F'
+104+  A47B C8               ret z                  ; Si hay 4 en raya, salir sin cambiar usuario
+105+  A47C
+106+  A47C 3A 72 9B         ld a,(ColumnaFull);comprobamos si la columna ha estado llena
+107+  A47F FE 01            cp 1
+108+  A481 CA EC A4         jp z, nohaycambio
+109+  A484 3A 74 9B         LD A, (Color_Usuario)   ; carga el color actual
+110+  A487 FE 06            CP TINTA_Yel            ; comparo con amarillo
+111+  A489 20 C8            JR NZ, ES_ROJO          ; si es amarillo se cambia a rojo
+112+  A48B 3E 02            LD A, TINTA_Red         ; cambiar a rojo (sin papel)
+113+  A48D 32 74 9B         LD (Color_Usuario), A
+114+  A490 26 00            LD H,0
+115+  A492 2E 00            ld L,0    ; Restaurar posición inicial
+116+  A494              ES_ROJOYNolocambio:
+117+  A494 CD 94 A3         CALL PintaCuadrao1
+118+  A497              L21:
+119+  A497 C5               PUSH BC                 ; Guardar BC al inicio del bucle
+120+  A498 01 FE DF         LD BC,$DFFE
+121+  A49B ED 78            IN A,(C)
+122+  A49D CB 47            BIT 0,A
+123+  A49F 20 0E            JR NZ,L22
+124+  A4A1 CD 2A A6         CALL SOLTAR_TECLA
+125+  A4A4 3E 50            LD A,'P'
+126+  A4A6 32 73 9B         LD (Caracter),A
+127+  A4A9 C1               POP BC
+128+  A4AA CD DB A3         CALL MOVER_DERECHA
+129+  A4AD 18 E8            jr L21
+130+  A4AF              L22:
+131+  A4AF CB 4F            BIT 1,A
+132+  A4B1 20 0E            JR NZ,L23
+133+  A4B3 CD 2A A6         CALL SOLTAR_TECLA
+134+  A4B6 3E 4F            LD A,'O'
+135+  A4B8 32 73 9B         LD (Caracter),A
+136+  A4BB C1               POP BC
+137+  A4BC CD EC A3         CALL MOVER_IZQUIERDA
+138+  A4BF 18 D6            jr L21
+139+  A4C1              L23:
+140+  A4C1 01 FE FD         LD BC,$FDFE
+141+  A4C4 ED 78            IN A,(C)
+142+  A4C6 CB 5F            BIT 3,A
+143+  A4C8 20 0A            JR NZ,L24
+144+  A4CA CD 2A A6         CALL SOLTAR_TECLA
+145+  A4CD 3E 46            LD A,'F'
+146+  A4CF 32 73 9B         LD (Caracter),A
+147+  A4D2 C1               POP BC
+148+  A4D3 C9               RET
+149+  A4D4              L24:                     ; Este cambia porque es RETURN y se carga como carácter $FF
+150+  A4D4 01 FE BF         LD BC,$BFFE
+151+  A4D7 ED 78            IN A,(C)
+152+  A4D9 CB 47            BIT 0,A
+153+  A4DB 20 0B            JR NZ,L25
+154+  A4DD CD 2A A6         CALL SOLTAR_TECLA
+155+  A4E0 3E FF            LD A,$FF
+156+  A4E2 32 73 9B         LD (Caracter),A
+157+  A4E5 C1               POP BC
+158+  A4E6 18 88            jr CAMBIAR_USUARIO
+159+  A4E8              L25:
+160+  A4E8 C1               POP BC              ; Limpiar stack si no se presionó ninguna tecla
+161+  A4E9 18 AC            jr L21
+162+  A4EB
+163+  A4EB C9               RET
+164+  A4EC              nohaycambio:
+165+  A4EC AF               xor a
+166+  A4ED 32 72 9B         ld (ColumnaFull), a
+167+  A4F0 3A 74 9B         LD A, (Color_Usuario)   ; carga el color actual
+168+  A4F3 FE 06            CP TINTA_Yel            ; comparo con amarillo
+169+  A4F5 C2 94 A4         JP NZ, ES_ROJOYNolocambio
+170+  A4F8 C3 01 A4         JP ES_AMARILLOYNolocambio
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\telasNuevas.asm
-103   A4DE                      INCLUDE "juego1.asm"
+103   A4FB                      INCLUDE "juego1.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\juego1.asm
-  1+  A4DE              JUEGO:
-  2+  A4DE CD BC 9F         CALL TABLERO_REDONDO
-  3+  A4E1 26 00            LD H, 0
-  4+  A4E3 2E 00            LD L, 0
-  5+  A4E5 CD 7D A3         CALL PintaCuadrao1
-  6+  A4E8              JUEGOEMPEZADO:
-  7+  A4E8 CD ED A3         CALL TECLAS
-  8+  A4EB 3A 73 9B         LD A,(Caracter)
-  9+  A4EE FE 46            CP 'F'
- 10+  A4F0 20 F6            jr nz, JUEGOEMPEZADO
- 11+  A4F2 C9               RET
+  1+  A4FB              JUEGO:
+  2+  A4FB                  ; REINICIAR VARIABLES AL INICIO DE CADA PARTIDA
+  3+  A4FB AF               XOR A
+  4+  A4FC 32 71 9B         LD (FullTablero), A    ; Reiniciar flag de tablero lleno
+  5+  A4FF 32 72 9B         LD (ColumnaFull), A    ; Reiniciar flag de columna llena
+  6+  A502
+  7+  A502                  ; LIMPIAR TABLERO Posiciones1 (6 filas x 9 bytes)
+  8+  A502 CD 1F A5         CALL LimpiarTablero
+  9+  A505
+ 10+  A505 CD BC 9F         CALL TABLERO_REDONDO
+ 11+  A508
+ 12+  A508                  ; Reiniciar color del usuario a amarillo DESPUES de TABLERO_REDONDO
+ 13+  A508                  ; (TABLERO_REDONDO modifica Color_Usuario internamente)
+ 14+  A508 3E 06            LD A, TINTA_Yel
+ 15+  A50A 32 74 9B         LD (Color_Usuario), A
+ 16+  A50D
+ 17+  A50D 26 00            LD H, 0
+ 18+  A50F 2E 00            LD L, 0
+ 19+  A511 CD 94 A3         CALL PintaCuadrao1
+ 20+  A514              JUEGOEMPEZADO:
+ 21+  A514 CD 04 A4         CALL TECLAS
+ 22+  A517 3A 73 9B         LD A,(Caracter)
+ 23+  A51A FE 46            CP 'F'
+ 24+  A51C 20 F6            jr nz, JUEGOEMPEZADO
+ 25+  A51E C9               RET
+ 26+  A51F
+ 27+  A51F              ; RUTINA: Limpia el tablero Posiciones1 poniendo 0 en las casillas y $FF en los bordes
+ 28+  A51F              LimpiarTablero:
+ 29+  A51F F5               PUSH AF
+ 30+  A520 C5               PUSH BC
+ 31+  A521 DD E5            PUSH IX
+ 32+  A523
+ 33+  A523 DD 21 9F 9B      LD IX, Posiciones1
+ 34+  A527 06 06            LD B, 6                ; 6 filas
+ 35+  A529              LimpiarFila:
+ 36+  A529 DD 36 00 FF      LD (IX), $FF           ; Borde izquierdo
+ 37+  A52D DD 36 01 00      LD (IX+1), 0           ; Columnas 0-6 a 0 (vacio)
+ 38+  A531 DD 36 02 00      LD (IX+2), 0
+ 39+  A535 DD 36 03 00      LD (IX+3), 0
+ 40+  A539 DD 36 04 00      LD (IX+4), 0
+ 41+  A53D DD 36 05 00      LD (IX+5), 0
+ 42+  A541 DD 36 06 00      LD (IX+6), 0
+ 43+  A545 DD 36 07 00      LD (IX+7), 0
+ 44+  A549 DD 36 08 FF      LD (IX+8), $FF         ; Borde derecho
+ 45+  A54D 11 09 00         LD DE, 9
+ 46+  A550 DD 19            ADD IX, DE             ; Siguiente fila
+ 47+  A552 10 D5            DJNZ LimpiarFila
+ 48+  A554
+ 49+  A554 DD E1            POP IX
+ 50+  A556 C1               POP BC
+ 51+  A557 F1               POP AF
+ 52+  A558 C9               RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\juego1.asm
-104   A4F3                      INCLUDE "terminar.asm"
+104   A559                      INCLUDE "terminar.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\terminar.asm
-  1+  A4F3              ;para saber si el juego ha terminado mirar primera fila si hay 0. Las primeras 7 filas está claro
-  2+  A4F3              Tablero_lleno:
-  3+  A4F3 F5               push af
-  4+  A4F4 DD E5            push ix
-  5+  A4F6 C5               push bc
-  6+  A4F7
-  7+  A4F7 DD 21 A0 9B      ld ix, Posiciones1 +1
-  8+  A4FB 06 07            ld b,7
-  9+  A4FD              bucle_compurebo:
- 10+  A4FD DD 7E 00         ld a, (ix)
- 11+  A500 B7               or a
- 12+  A501 28 09            jr z, nolleno
- 13+  A503 DD 23            inc ix
- 14+  A505 10 F6            djnz bucle_compurebo
- 15+  A507                  ;si pasa por aquí está lleno
- 16+  A507 3E 01            ld a, 1
- 17+  A509 32 71 9B         ld(FullTablero), a
- 18+  A50C              nolleno:
- 19+  A50C C1               pop bc
- 20+  A50D DD E1            pop ix
- 21+  A50F F1               pop af
- 22+  A510 C9               ret
+  1+  A559              ;para saber si el juego ha terminado mirar primera fila si hay 0. Las primeras 7 filas está claro
+  2+  A559              Tablero_lleno:
+  3+  A559 F5               push af
+  4+  A55A DD E5            push ix
+  5+  A55C C5               push bc
+  6+  A55D
+  7+  A55D DD 21 A0 9B      ld ix, Posiciones1 +1
+  8+  A561 06 07            ld b,7
+  9+  A563              bucle_compurebo:
+ 10+  A563 DD 7E 00         ld a, (ix)
+ 11+  A566 B7               or a
+ 12+  A567 28 09            jr z, nolleno
+ 13+  A569 DD 23            inc ix
+ 14+  A56B 10 F6            djnz bucle_compurebo
+ 15+  A56D                  ;si pasa por aquí está lleno
+ 16+  A56D 3E 01            ld a, 1
+ 17+  A56F 32 71 9B         ld(FullTablero), a
+ 18+  A572              nolleno:
+ 19+  A572 C1               pop bc
+ 20+  A573 DD E1            pop ix
+ 21+  A575 F1               pop af
+ 22+  A576 C9               ret
+ 23+  A577
+ 24+  A577              tamcolumna EQU 9
+ 25+  A577
+ 26+  A577              ; Entrada: H = fila (0-5), L = columna (0-6) donde cayo la ficha
+ 27+  A577              ; Salida: Carry=1 si hay 4 en raya, Carry=0 si no
+ 28+  A577              ; Si hay 4 en raya, pone Caracter='F' para que el juego pare
+ 29+  A577              ; Usa Posiciones1 con bordes $FF como topes
+ 30+  A577              Comprobar4enraya:
+ 31+  A577 F5               push af
+ 32+  A578 C5               push bc
+ 33+  A579 D5               push de
+ 34+  A57A E5               push hl
+ 35+  A57B DD E5            push ix
+ 36+  A57D
+ 37+  A57D                  ; Usar SlotPointer_Array para calcular direccion en Posiciones1
+ 38+  A57D CD 15 A6         call SlotPointer_Array   ; IX = direccion de la ficha en Posiciones1
+ 39+  A580
+ 40+  A580 DD 4E 00         ld c, (ix)           ; C = color de la ficha (TINTA_Yel=6 o TINTA_Red=2)
+ 41+  A583
+ 42+  A583                  ; Guardar IX para restaurar en cada comprobacion
+ 43+  A583 DD E5            push ix
+ 44+  A585
+ 45+  A585                  ; 1) HORIZONTAL (izquierda <-> derecha): DE = 1
+ 46+  A585 11 01 00         ld de, 1
+ 47+  A588 CD D2 A5         call cb1
+ 48+  A58B FE 04            cp 4
+ 49+  A58D 30 34            jr nc, hay_4enraya_pop
+ 50+  A58F
+ 51+  A58F                  ; 2) VERTICAL (arriba <-> abajo): DE = 9 (tamcolumna)
+ 52+  A58F DD E1            pop ix
+ 53+  A591 DD E5            push ix
+ 54+  A593 11 09 00         ld de, tamcolumna
+ 55+  A596 CD D2 A5         call cb1
+ 56+  A599 FE 04            cp 4
+ 57+  A59B 30 26            jr nc, hay_4enraya_pop
+ 58+  A59D
+ 59+  A59D                  ; 3) DIAGONAL \ (arriba-izq <-> abajo-der): DE = 10 (tamcolumna+1)
+ 60+  A59D DD E1            pop ix
+ 61+  A59F DD E5            push ix
+ 62+  A5A1 11 0A 00         ld de, tamcolumna + 1
+ 63+  A5A4 CD D2 A5         call cb1
+ 64+  A5A7 FE 04            cp 4
+ 65+  A5A9 30 18            jr nc, hay_4enraya_pop
+ 66+  A5AB
+ 67+  A5AB                  ; 4) DIAGONAL / (arriba-der <-> abajo-izq): DE = 8 (tamcolumna-1)
+ 68+  A5AB DD E1            pop ix
+ 69+  A5AD DD E5            push ix
+ 70+  A5AF 11 08 00         ld de, tamcolumna - 1
+ 71+  A5B2 CD D2 A5         call cb1
+ 72+  A5B5 FE 04            cp 4
+ 73+  A5B7 30 0A            jr nc, hay_4enraya_pop
+ 74+  A5B9
+ 75+  A5B9                  ; No hay 4 en raya
+ 76+  A5B9 DD E1            pop ix               ; limpiar stack
+ 77+  A5BB DD E1            pop ix
+ 78+  A5BD E1               pop hl
+ 79+  A5BE D1               pop de
+ 80+  A5BF C1               pop bc
+ 81+  A5C0 F1               pop af
+ 82+  A5C1 B7               or a                 ; Carry = 0
+ 83+  A5C2 C9               ret
+ 84+  A5C3
+ 85+  A5C3              hay_4enraya_pop:
+ 86+  A5C3 DD E1            pop ix               ; limpiar stack
+ 87+  A5C5              hay_4enraya:
+ 88+  A5C5 3E 46            ld a, 'F'
+ 89+  A5C7 32 73 9B         ld (Caracter), a
+ 90+  A5CA DD E1            pop ix
+ 91+  A5CC E1               pop hl
+ 92+  A5CD D1               pop de
+ 93+  A5CE C1               pop bc
+ 94+  A5CF F1               pop af
+ 95+  A5D0 37               scf                  ; Carry = 1
+ 96+  A5D1 C9               ret
+ 97+  A5D2
+ 98+  A5D2              ; Subrutina: Contar fichas consecutivas en ambas direcciones
+ 99+  A5D2              ; Entrada: IX = posicion central, C = color a buscar, DE = desplazamiento
+100+  A5D2              ; Salida: A = total de fichas consecutivas
+101+  A5D2              ; Los bordes $FF actuan como tope (nunca coinciden con color 2 o 6)
+102+  A5D2              cb1:
+103+  A5D2 DD E5            push ix              ; guardar posicion central
+104+  A5D4 06 01            ld b, 1              ; B = contador (1 por la ficha central)
+105+  A5D6 D5               push de              ; guardar DE
+106+  A5D7
+107+  A5D7                  ; Contar en direccion positiva (+DE)
+108+  A5D7              cb2_bucle1:
+109+  A5D7 DD 19            add ix, de
+110+  A5D9 DD 7E 00         ld a, (ix)           ; Leer casilla
+111+  A5DC B9               cp c                 ; Es del mismo color? (si es $FF o 0 o diferente, para)
+112+  A5DD 20 03            jr nz, cb1_seguir
+113+  A5DF 04               inc b
+114+  A5E0 18 F5            jr cb2_bucle1
+115+  A5E2
+116+  A5E2              cb1_seguir:
+117+  A5E2                  ; Restaurar para direccion negativa
+118+  A5E2 D1               pop de
+119+  A5E3 DD E1            pop ix
+120+  A5E5 DD E5            push ix
+121+  A5E7
+122+  A5E7                  ; Negar DE
+123+  A5E7 AF               xor a
+124+  A5E8 93               sub e
+125+  A5E9 5F               ld e, a
+126+  A5EA 3E 00            ld a, 0
+127+  A5EC 9A               sbc a, d
+128+  A5ED 57               ld d, a              ; DE = -DE
+129+  A5EE
+130+  A5EE                  ; Contar en direccion negativa
+131+  A5EE              cb2_bucle2:
+132+  A5EE DD 19            add ix, de
+133+  A5F0 DD 7E 00         ld a, (ix)           ; Leer casilla
+134+  A5F3 B9               cp c                 ; Es del mismo color?
+135+  A5F4 20 03            jr nz, cb1_fin
+136+  A5F6 04               inc b
+137+  A5F7 18 F5            jr cb2_bucle2
+138+  A5F9
+139+  A5F9              cb1_fin:
+140+  A5F9 DD E1            pop ix
+141+  A5FB 78               ld a, b              ; A = total
+142+  A5FC C9               ret
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\terminar.asm
-105   A511                     INCLUDE "slotpointer.asm"
+105   A5FD                     INCLUDE "slotpointer.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\slotpointer.asm
-  1+  A511              SlotPointer: ;h fila, l columna y te devuelve coordenada de atributos
-  2+  A511 7C               ld a,h
-  3+  A512 CB 27            sla a
-  4+  A514 CB 27            sla a
-  5+  A516 CB 27            sla a
-  6+  A518 CB 27            sla a
-  7+  A51A CB 27            sla a
-  8+  A51C B5               or L
-  9+  A51D 6F               ld l,a
- 10+  A51E 7C               ld a,h
- 11+  A51F CB 2F            sra a
- 12+  A521 CB 2F            sra a
- 13+  A523 CB 2F            sra a
- 14+  A525 F6 58            or $58
- 15+  A527 67               ld h,a
- 16+  A528 C9               ret
- 17+  A529
+  1+  A5FD              SlotPointer: ;h fila, l columna y te devuelve coordenada de atributos
+  2+  A5FD 7C               ld a,h
+  3+  A5FE CB 27            sla a
+  4+  A600 CB 27            sla a
+  5+  A602 CB 27            sla a
+  6+  A604 CB 27            sla a
+  7+  A606 CB 27            sla a
+  8+  A608 B5               or L
+  9+  A609 6F               ld l,a
+ 10+  A60A 7C               ld a,h
+ 11+  A60B CB 2F            sra a
+ 12+  A60D CB 2F            sra a
+ 13+  A60F CB 2F            sra a
+ 14+  A611 F6 58            or $58
+ 15+  A613 67               ld h,a
+ 16+  A614 C9               ret
+ 17+  A615
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\slotpointer.asm
-106   A529
-107   A529
-108   A529
-109   A529
-110   A529
-111   A529              SOLTAR_TECLA:
-112   A529 ED 78               IN A, (C)
-113   A52B E6 1F               AND $1F ;ASEGURA QUE LOS BITS DE A (0-7) LOS PRIMEROS 5 SON LOS Q NOS INTERESAN, ASEGURA QUE A VALGA %00011111
-114   A52D FE 1F               CP $1F ;COMPRUEBA SI SE HA ESCRITO ALGO PORQUE SI VALE 1F SIGNIFICA QUE NO SE HA PULSADO TECLAS
-115   A52F 20 F8               JR NZ, SOLTAR_TECLA ;SI Z=0 (ES DECIR, A ES DISTINTO DE $1F), LA TECLA SIGUE PULSADA ENTONCES BUCLE HASTA QUE EL USUARIO LA SUELTE
-116   A531 C9                  RET
-117   A532
-118   A532
-119   A532
-120   A532
-121   A532
-122   A532
-123   A532              LEER_SN:
-124   A532 C5                  PUSH BC
-125   A533              SN_0:
-126   A533 01 FE FD            LD BC, $FDFE ;'S' en D1
-127   A536 ED 78               IN A, (C)
-128   A538 CB 4F               BIT 1, A
-129   A53A 20 0B               JR NZ, SN_1
-130   A53C CD 29 A5            CALL SOLTAR_TECLA
-131   A53F 3E 53               LD A, 'S'
-132   A541 CD A9 9C            CALL CLEARSCR
-133   A544                     ;Z=1
-134   A544 AF                  XOR A
-135   A545 C1                  POP BC
-136   A546 C9                  RET
-137   A547
-138   A547              SN_1:
-139   A547 01 FE 7F            LD BC, $7FFE ;'N' en D3
-140   A54A ED 78               IN A, (C)
-141   A54C CB 5F               BIT 3, A
-142   A54E 20 E3               JR NZ, SN_0
-143   A550 CD 29 A5            CALL SOLTAR_TECLA
-144   A553 3E 4E               LD A, 'N'
-145   A555 CD A9 9C            CALL CLEARSCR
-146   A558 3E 00               LD A, 0
-147   A55A D3 FE               OUT ($FE), A
-148   A55C CD A9 9C            CALL CLEARSCR
-149   A55F 06 0C               LD B, 12
-150   A561 0E 0C               LD C, 12
-151   A563 3E 50               LD A, 0+2*8+64
-152   A565 DD 21 2D 9B         LD IX, M_GB
-153   A569 CD 38 9C            CALL PRINTAT
-154   A56C                     ;Z=0
-155   A56C 3E 01               LD A, 1
-156   A56E B7                  OR A
-157   A56F C1                  POP BC
-158   A570 C9                  RET
+106   A615                     INCLUDE "SlotPointer_PosicionesArray.asm"
+# file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\SlotPointer_PosicionesArray.asm
+  1+  A615              ; SlotPointer para el array Posiciones1
+  2+  A615              ; Similar a SlotPointer pero calcula la direccion en Posiciones1 en vez de atributos de pantalla
+  3+  A615              ; Entrada: H = fila (0-5), L = columna (0-6)
+  4+  A615              ; Salida: IX = direccion en Posiciones1
+  5+  A615              ; Modifica: A, DE, IX
+  6+  A615              SlotPointer_Array:
+  7+  A615 7C               ld a, h              ; A = fila
+  8+  A616 47               ld b, a              ; B = fila (guardar)
+  9+  A617
+ 10+  A617                  ; fila * 9 = fila*8 + fila
+ 11+  A617 CB 27            sla a                ; A = fila*2
+ 12+  A619 CB 27            sla a                ; A = fila*4
+ 13+  A61B CB 27            sla a                ; A = fila*8
+ 14+  A61D 80               add a, b             ; A = fila*9
+ 15+  A61E 85               add a, l             ; A = fila*9 + columna
+ 16+  A61F 3C               inc a                ; +1 por borde $FF izquierdo
+ 17+  A620
+ 18+  A620 5F               ld e, a
+ 19+  A621 16 00            ld d, 0
+ 20+  A623 DD 21 9F 9B      ld ix, Posiciones1
+ 21+  A627 DD 19            add ix, de           ; IX = Posiciones1 + offset
+ 22+  A629 C9               ret
+ 23+  A62A
+# file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\SlotPointer_PosicionesArray.asm
+107   A62A
+108   A62A
+109   A62A
+110   A62A
+111   A62A
+112   A62A              SOLTAR_TECLA:
+113   A62A ED 78               IN A, (C)
+114   A62C E6 1F               AND $1F ;ASEGURA QUE LOS BITS DE A (0-7) LOS PRIMEROS 5 SON LOS Q NOS INTERESAN, ASEGURA QUE A VALGA %00011111
+115   A62E FE 1F               CP $1F ;COMPRUEBA SI SE HA ESCRITO ALGO PORQUE SI VALE 1F SIGNIFICA QUE NO SE HA PULSADO TECLAS
+116   A630 20 F8               JR NZ, SOLTAR_TECLA ;SI Z=0 (ES DECIR, A ES DISTINTO DE $1F), LA TECLA SIGUE PULSADA ENTONCES BUCLE HASTA QUE EL USUARIO LA SUELTE
+117   A632 C9                  RET
+118   A633
+119   A633
+120   A633
+121   A633
+122   A633
+123   A633
+124   A633              LEER_SN:
+125   A633 C5                  PUSH BC
+126   A634              SN_0:
+127   A634 01 FE FD            LD BC, $FDFE ;'S' en D1
+128   A637 ED 78               IN A, (C)
+129   A639 CB 4F               BIT 1, A
+130   A63B 20 0B               JR NZ, SN_1
+131   A63D CD 2A A6            CALL SOLTAR_TECLA
+132   A640 3E 53               LD A, 'S'
+133   A642 CD A9 9C            CALL CLEARSCR
+134   A645                     ;Z=1
+135   A645 AF                  XOR A
+136   A646 C1                  POP BC
+137   A647 C9                  RET
+138   A648
+139   A648              SN_1:
+140   A648 01 FE 7F            LD BC, $7FFE ;'N' en D3
+141   A64B ED 78               IN A, (C)
+142   A64D CB 5F               BIT 3, A
+143   A64F 20 E3               JR NZ, SN_0
+144   A651 CD 2A A6            CALL SOLTAR_TECLA
+145   A654 3E 4E               LD A, 'N'
+146   A656 CD A9 9C            CALL CLEARSCR
+147   A659 3E 00               LD A, 0
+148   A65B D3 FE               OUT ($FE), A
+149   A65D CD A9 9C            CALL CLEARSCR
+150   A660 06 0C               LD B, 12
+151   A662 0E 0C               LD C, 12
+152   A664 3E 50               LD A, 0+2*8+64
+153   A666 DD 21 2D 9B         LD IX, M_GB
+154   A66A CD 38 9C            CALL PRINTAT
+155   A66D                     ;Z=0
+156   A66D 3E 01               LD A, 1
+157   A66F B7                  OR A
+158   A670 C1                  POP BC
+159   A671 C9                  RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\main.asm

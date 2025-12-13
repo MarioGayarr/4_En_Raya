@@ -430,12 +430,19 @@ SEGUIR:
         POP BC
         RET
 
+; Variables para guardar posicion final de la ficha (usadas por Comprobar4enraya)
+ColumnaFinal: db 0              ; Columna donde cayo la ficha (0-6)
+FilaFinal:    db 0              ; Fila donde cayo la ficha (0-5)
+
 Animacion_Caeficha:
 
         xor a
         ld (ColumnaFull), a
 
+        ; GUARDAMOS LA COLUMNA para usarla despues en Comprobar4enraya
         ld a, l                ; A columna (0-6)
+        ld (ColumnaFinal), a   ; Guardar columna para despues
+        
         ld ix, Posiciones1     ; IX = inicio del tablero
         inc a                  ; +1 por el $ff
         ld e, a
@@ -464,6 +471,13 @@ HuecoEncontrado:
         ld a, (Color_Usuario)
         ld (ix), a
 
+        ; CALCULAMOS Y GUARDAMOS LA FILA FINAL
+        ; B=6 -> fila 5, B=5 -> fila 4, ..., B=1 -> fila 0
+        ; Fila = B - 1
+        ld a, b
+        dec a
+        ld (FilaFinal), a      ; Guardar fila para Comprobar4enraya
+
         ; B vale filas probadas
         ld c, b                ; C = veces que cae
         ld h, 0                ; empezar caida desde encima del tablero
@@ -479,6 +493,15 @@ bucle_Cae:
 TerminaAnimacion:
         xor a
         ld (ColumnaFull), a
+        ; Cargar fila y columna guardadas para Comprobar4enraya
+        ; H = fila (0-5), L = columna (0-6)
+        push hl                ; Guardar HL actual
+        ld a, (FilaFinal)
+        ld h, a
+        ld a, (ColumnaFinal)
+        ld l, a
+        call Comprobar4enraya
+        pop hl                 ; Restaurar HL
         ret
 ColumnaLlena:
         ld a, 1

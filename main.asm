@@ -103,6 +103,7 @@ fin:
         INCLUDE "juego1.asm"
         INCLUDE "terminar.asm"
        INCLUDE "slotpointer.asm"
+       INCLUDE "SlotPointer_PosicionesArray.asm"
 
 
 
