@@ -17,7 +17,15 @@ M_PF:
        DB "La partida ha finalizado  ", 0 
 M_QJ: 
        DB "Quieres jugar otra partida? ", 0
+M_GAN_AMARILLO:
+       DB "Ganador: Amarillo", 0
+M_GAN_ROJO:
+       DB "Ganador: Rojo", 0
+M_TABLAS:
+       DB "Tablas", 0
 FullTablero DB 0
+ContadorFichas DB 0
+Ganador DB 0          ; 0=tablas, TINTA_Yel=amarillo, TINTA_Red=rojo
 ColumnaFull db 0
 Caracter DB 0
 PAPEL_Azul EQU 1*8
@@ -79,6 +87,9 @@ JUGAR_NUEVAMENTE:  ; empieza limpiando e imprimiendo los dos textos de la pantal
        LD A, 1
        LD IX, M_PF
        CALL PRINTAT
+
+       ; Mostrar resultado de la partida
+       CALL MostrarResultado
 
        LD A, 6
        LD B, 12

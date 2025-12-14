@@ -42,13 +42,13 @@ Comprobar4enraya:
     ; Guardar IX para restaurar en cada comprobacion
     push ix
     
-    ; 1) HORIZONTAL (izquierda <-> derecha): DE = 1
+    ; 1) HORIZONTAL (izquierda, derecha): DE = 1
     ld de, 1
     call cb1
     cp 4
     jr nc, hay_4enraya_pop
     
-    ; 2) VERTICAL (arriba <-> abajo): DE = 9 (tamcolumna)
+    ; 2) VERTICAL (arriba, abajo): DE = 9 (tamcolumna)
     pop ix
     push ix
     ld de, tamcolumna
@@ -56,7 +56,7 @@ Comprobar4enraya:
     cp 4
     jr nc, hay_4enraya_pop
     
-    ; 3) DIAGONAL \ (arriba-izq <-> abajo-der): DE = 10 (tamcolumna+1)
+    ; 3) DIAGONAL (arriba-izq, abajo-der): DE = 10 (tamcolumna+1)
     pop ix
     push ix
     ld de, tamcolumna + 1
@@ -64,7 +64,7 @@ Comprobar4enraya:
     cp 4
     jr nc, hay_4enraya_pop
     
-    ; 4) DIAGONAL / (arriba-der <-> abajo-izq): DE = 8 (tamcolumna-1)
+    ; 4) DIAGONAL (arriba-der <-> abajo-izq): DE = 8 (tamcolumna-1)
     pop ix
     push ix
     ld de, tamcolumna - 1
@@ -85,6 +85,10 @@ Comprobar4enraya:
 hay_4enraya_pop:
     pop ix               ; limpiar stack
 hay_4enraya:
+    ; Guardar color del ganador
+    ld a, c              ; C tiene el color de la ficha ganadora
+    ld (Ganador), a      ; Guardar ganador
+    
     ld a, 'F'
     ld (Caracter), a
     pop ix
@@ -119,7 +123,7 @@ cb1_seguir:
     pop ix
     push ix
     
-    ; Negar DE
+    ; Negar DE para contar en direccion negativa
     xor a
     sub e
     ld e, a
@@ -139,4 +143,53 @@ cb2_bucle2:
 cb1_fin:
     pop ix
     ld a, b              ; A = total
+    ret
+
+; Rutina: Mostrar resultado de la partida (centrado debajo de "La partida ha finalizado")
+; Muestra "Ganador: Amarillo", "Ganador: Rojo" o "Tablas" segun el valor de Ganador
+MostrarResultado:
+    push af
+    push bc
+    push ix
+    
+    ld a, (Ganador)
+    
+    ; Comprobar si es amarillo (TINTA_Yel = 6)
+    cp TINTA_Yel
+    jr z, MostrarAmarillo
+    
+    ; Comprobar si es rojo (TINTA_Red = 2)
+    cp TINTA_Red
+    jr z, MostrarRojo
+    
+    ; Si no es ninguno, son tablas (Ganador = 0)
+    ; "Tablas" = 6 caracteres, centrado en columna (32-6)/2 = 13
+    ld b, 3              ; Fila 3 (debajo de "La partida ha finalizado" que esta en fila 1)
+    ld c, 13             ; Columna 13 (centrado)
+    ld a, 7              ; Atributo blanco
+    ld ix, M_TABLAS
+    call PRINTAT
+    jr FinMostrarResultado
+    
+MostrarAmarillo:
+    ; "Ganador: Amarillo" = 17 caracteres, centrado en columna (32-17)/2 = 7
+    ld b, 3              ; Fila 3
+    ld c, 7              ; Columna 7 (centrado)
+    ld a, TINTA_Yel      ; Atributo amarillo
+    ld ix, M_GAN_AMARILLO
+    call PRINTAT
+    jr FinMostrarResultado
+    
+MostrarRojo:
+    ; "Ganador: Rojo" = 13 caracteres, centrado en columna (32-13)/2 = 9
+    ld b, 3              ; Fila 3
+    ld c, 9              ; Columna 9 (centrado)
+    ld a, TINTA_Red      ; Atributo rojo
+    ld ix, M_GAN_ROJO
+    call PRINTAT
+    
+FinMostrarResultado:
+    pop ix
+    pop bc
+    pop af
     ret

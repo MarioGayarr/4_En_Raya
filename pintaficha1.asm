@@ -493,6 +493,12 @@ bucle_Cae:
 TerminaAnimacion:
         xor a
         ld (ColumnaFull), a
+        
+        ; Incrementar contador de fichas
+        ld a, (ContadorFichas)
+        inc a
+        ld (ContadorFichas), a
+        
         ; Cargar fila y columna guardadas para Comprobar4enraya
         ; H = fila (0-5), L = columna (0-6)
         push hl                ; Guardar HL actual
@@ -502,6 +508,20 @@ TerminaAnimacion:
         ld l, a
         call Comprobar4enraya
         pop hl                 ; Restaurar HL
+        
+        ; Si hay 4 en raya, ya termino (Caracter='F')
+        ld a, (Caracter)
+        cp 'F'
+        ret z
+        
+        ; Comprobar si tablero lleno (42 fichas = 6 filas x 7 columnas)
+        ld a, (ContadorFichas)
+        cp 42
+        ret nz                 ; Si no esta lleno, seguir jugando
+        
+        ; Tablero lleno = tablas
+        ld a, 'F'
+        ld (Caracter), a       ; Terminar juego
         ret
 ColumnaLlena:
         ld a, 1

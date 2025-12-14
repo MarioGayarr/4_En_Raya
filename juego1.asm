@@ -3,6 +3,8 @@ JUEGO:
     XOR A
     LD (FullTablero), A    ; Reiniciar flag de tablero lleno
     LD (ColumnaFull), A    ; Reiniciar flag de columna llena
+    LD (ContadorFichas), A ; Reiniciar contador de fichas
+    LD (Ganador), A        ; Reiniciar ganador (0 = tablas)
     
     ; LIMPIAR TABLERO Posiciones1 (6 filas x 9 bytes)
     CALL LimpiarTablero
