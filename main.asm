@@ -17,6 +17,7 @@ M_QJ:           DB "Quieres jugar otra partida? ", 0
 M_GAN_AMARILLO: DB "Ganador: Amarillo", 0
 M_GAN_ROJO:     DB "Ganador: Rojo", 0
 M_TABLAS:       DB "Tablas", 0
+M_COL_LLENA:    DB "Columna llena!", 0
 
 ;Variables de estado del juego
 FullTablero:    DB 0                    ; Flag: 1 = tablero lleno

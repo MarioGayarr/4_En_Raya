@@ -212,9 +212,44 @@ CAMBIAR_FIN:
 nohaycambio:
         XOR     A                       ; Limpiar flag de columna llena
         LD      (ColumnaFull), A
+        
+        ; Guardar posición actual de la ficha
+        PUSH    HL
+        
+        ; Mostrar aviso de columna llena
+        PUSH    IX
+        LD      B, 0                    ; Fila 0 (arriba del tablero)
+        LD      C, 0                    ; Columna 0
+        LD      A, 2+64                 ; Atributo: rojo brillante
+        LD      IX, M_COL_LLENA
+        CALL    PRINTAT                 ; Mostrar "Columna llena!"
+        
+        ; Esperar un momento para que se vea
+        LD      BC, $8000               ; Retardo
+retardo_aviso:
+        DEC     BC
+        LD      A, B
+        OR      C
+        JR      NZ, retardo_aviso
+        
+        ; Borrar el mensaje
+        LD      B, 0                    ; Fila 0
+        LD      C, 0                    ; Columna 0
+        LD      A, 0                    ; Atributo: negro
+        LD      IX, M_ESPACIOS
+        CALL    PRINTAT                 ; Borrar mensaje
+        POP     IX
+        
+        ; Restaurar posición y redibujar la ficha
+        POP     HL
+        CALL    PintaCuadrao1
+        
         LD      A, (Color_Usuario)
         CP      TINTA_Yel               ; ¿Es amarillo?
-        JP      NZ, ES_ROJOYNolocambio  ; No, es rojo
+        JP      NZ, nohaycambio_rojo    ; No, es rojo
         POP     DE
         POP     BC
-        JP      ES_AMARILLOYNolocambio  ; Sí, es amarillo 
+        JP      TECLAS                  ; Volver a leer teclas amarillo
+        
+nohaycambio_rojo:
+        JP      L21                     ; Volver a leer teclas rojo 
