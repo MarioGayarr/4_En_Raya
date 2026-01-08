@@ -1,170 +1,220 @@
-;funciones al leer una tecla válida(excepto F que hace que salga):
+;MOVER_DERECHA: Mueve el cursor a la derecha
 MOVER_DERECHA:
-    CALL BORRAR_FICHA1
-    INC L
-    LD A, L
-    CP POS_MAX1
-    JR Z, DIBUJA_DCHA
-    JR C, DIBUJA_DCHA
+        PUSH    BC
+        PUSH    DE
+        
+        CALL    BORRAR_FICHA1           ; Borrar ficha actual
+        INC     L                       ; Siguiente columna
+        LD      A, L
+        CP      POS_MAX1                ; ¿Llegó al máximo?
+        JR      Z, DIBUJA_DCHA          ; Sí, dibujar ahí
+        JR      C, DIBUJA_DCHA          ; Aún no, dibujar
+        
 SALTO_FINAL:
-    LD L, 0
+        LD      L, 0                    ; Wrap-around a columna 0
+
 DIBUJA_DCHA:
-    CALL PintaCuadrao1
-    RET      
+        CALL    PintaCuadrao1           ; Dibujar en nueva posición
+        
+        POP     DE
+        POP     BC
+        RET      
 
-
+;MOVER_IZQUIERDA: Mueve el cursor a la izquierda
 MOVER_IZQUIERDA:
-    CALL BORRAR_FICHA1
-    LD A, L
-    CP POS_MIN1
-    JR Z, SALTO_INICIO
-    JR C, SALTO_INICIO
-    DEC L
-    CALL PintaCuadrao1
-    RET      
-SALTO_INICIO:
-    LD L, POS_MAX1
-    CALL PintaCuadrao1
-    RET
+        PUSH    BC
+        PUSH    DE
+        
+        CALL    BORRAR_FICHA1           ; Borrar ficha actual
+        LD      A, L
+        CP      POS_MIN1                ; ¿Está en el mínimo?
+        JR      Z, SALTO_INICIO         ; Sí, wrap
+        JR      C, SALTO_INICIO
+        DEC     L                       ; Columna anterior
+        CALL    PintaCuadrao1           ; Dibujar en nueva posición
+        
+        POP     DE
+        POP     BC
+        RET
 
-;función principal---------------------------------
+SALTO_INICIO:
+        LD      L, POS_MAX1             ; Wrap-around a columna máxima
+        CALL    PintaCuadrao1           ; Dibujar en nueva posición
+        
+        POP     DE
+        POP     BC
+        RET
+
+;ES_AMARILLOYNolocambio: Redibuja el cursor del jugador amarillo
 ES_AMARILLOYNolocambio:
-    CALL PintaCuadrao1
-TECLAS: ; CAMBIA A
-    PUSH BC
+        CALL    PintaCuadrao1           ; Redibujar cursor
+
+;TECLAS: Lee teclas del jugador amarillo
+TECLAS:
+        PUSH    BC
 
 L15:
-    LD BC,$FBFE
-    IN A,(C)
-    BIT 0,A
-    JR NZ,L16
-    CALL SOLTAR_TECLA
-    LD A,'Q'
-    LD (Caracter),A
-    POP BC
-    CALL MOVER_IZQUIERDA
-    RET
-L16:
-    BIT 1,A
-    JR NZ,L17
-    CALL SOLTAR_TECLA
-    LD A,'W'
-    LD (Caracter),A
-    POP BC
-    CALL MOVER_DERECHA
-    RET
+        LD      BC, $FBFE
+        IN      A, (C)                  ; Leer puerto $FBFE
+        BIT     0, A                    ; Comprobar tecla Q
+        JR      NZ, L16                 ; No pulsada, siguiente
+        CALL    SOLTAR_TECLA
+        LD      A, 'Q'
+        LD      (Caracter), A
+        POP     BC
+        CALL    MOVER_IZQUIERDA         ; Mover a la izquierda
+        RET
 
+L16:
+        BIT     1, A                    ; Comprobar tecla W
+        JR      NZ, L17                 ; No pulsada, siguiente
+        CALL    SOLTAR_TECLA
+        LD      A, 'W'
+        LD      (Caracter), A
+        POP     BC
+        CALL    MOVER_DERECHA           ; Mover a la derecha
+        RET
        
 L17:
-    LD BC,$FDFE
-    IN A,(C)
-    BIT 3,A
-    JR NZ,L5
-    CALL SOLTAR_TECLA
-    LD A,'F'
-    LD (Caracter),A
-    POP BC
-    RET
-L5:                     ; Este cambia porque es RETURN y se carga como carácter $FF
-    LD BC,$BFFE
-    IN A,(C)
-    BIT 0,A
-    JR NZ,L15
-    CALL SOLTAR_TECLA
-    LD A,$FF
-    LD (Caracter),A
-    POP BC
-    jr CAMBIAR_USUARIO
+        LD      BC, $FDFE
+        IN      A, (C)                  ; Leer puerto $FDFE
+        BIT     3, A                    ; Comprobar tecla F
+        JR      NZ, L5                  ; No pulsada, siguiente
+        CALL    SOLTAR_TECLA
+        LD      A, 'F'
+        LD      (Caracter), A
+        POP     BC
+        RET                             ; Finalizar
 
+L5:
+        LD      BC, $BFFE
+        IN      A, (C)                  ; Leer puerto $BFFE
+        BIT     0, A                    ; Comprobar ENTER
+        JR      NZ, L15                 ; No pulsada, seguir
+        CALL    SOLTAR_TECLA
+        LD      A, $FF                  ; Código especial ENTER
+        LD      (Caracter), A
+        POP     BC
+        JP      CAMBIAR_USUARIO
 
-;cambio de usuario y lectura de movimiento con o-p  
+;ES_ROJO: Prepara el turno del otro jugador
 ES_ROJO:
-    CALL Tablero_lleno
-    ld a, (FullTablero)
-    cp 1
-    jr z, seAcaba
-    LD A, TINTA_Yel          ; cambiar a amarillo (sin papel)
-    LD (Color_Usuario), A
-    LD H,0    ; Restaurar posición inicial
-    LD L,0
-    CALL PintaCuadrao1
-    RET
+        CALL    Tablero_lleno           ; Comprobar si está lleno
+        LD      A, (FullTablero)
+        CP      1                       ; ¿Tablero lleno?
+        JR      Z, seAcaba              ; Sí, terminar
+        
+        LD      A, TINTA_Yel            ; Cambiar a amarillo
+        LD      (Color_Usuario), A
+        LD      H, 0                    ; Posición inicial
+        LD      L, 0
+        CALL    PintaCuadrao1           ; Dibujar cursor
+        RET
+
 seAcaba:
-    ld a, "F"
-    ld(Caracter), A
-    ret
+        LD      A, 'F'                  ; Marcar fin
+        LD      (Caracter), A
+        RET
 
+;CAMBIAR_USUARIO: Procesa la jugada y cambia de jugador
 CAMBIAR_USUARIO:
-    CALL BORRAR_FICHA1
-    CALL Animacion_Caeficha
-    
-    ; Comprobar si hay 4 en raya (Caracter = 'F') y salir inmediatamente
-    ld a, (Caracter)
-    cp 'F'
-    ret z                  ; Si hay 4 en raya, salir sin cambiar usuario
-    
-    ld a,(ColumnaFull);comprobamos si la columna ha estado llena
-    cp 1
-    jp z, nohaycambio
-    LD A, (Color_Usuario)   ; carga el color actual
-    CP TINTA_Yel            ; comparo con amarillo
-    JR NZ, ES_ROJO          ; si es amarillo se cambia a rojo
-    LD A, TINTA_Red         ; cambiar a rojo (sin papel)
-    LD (Color_Usuario), A
-    LD H,0
-    ld L,0    ; Restaurar posición inicial
-ES_ROJOYNolocambio:
-    CALL PintaCuadrao1
-L21:
-    PUSH BC                 ; Guardar BC al inicio del bucle
-    LD BC,$DFFE
-    IN A,(C)
-    BIT 0,A
-    JR NZ,L22
-    CALL SOLTAR_TECLA
-    LD A,'P'
-    LD (Caracter),A
-    POP BC
-    CALL MOVER_DERECHA
-    jr L21
-L22:
-    BIT 1,A
-    JR NZ,L23
-    CALL SOLTAR_TECLA
-    LD A,'O'
-    LD (Caracter),A
-    POP BC
-    CALL MOVER_IZQUIERDA
-    jr L21
-L23:
-    LD BC,$FDFE
-    IN A,(C)
-    BIT 3,A
-    JR NZ,L24
-    CALL SOLTAR_TECLA
-    LD A,'F'
-    LD (Caracter),A
-    POP BC
-    RET
-L24:                     ; Este cambia porque es RETURN y se carga como carácter $FF
-    LD BC,$BFFE
-    IN A,(C)
-    BIT 0,A
-    JR NZ,L25
-    CALL SOLTAR_TECLA
-    LD A,$FF
-    LD (Caracter),A
-    POP BC
-    jr CAMBIAR_USUARIO
-L25:
-    POP BC              ; Limpiar stack si no se presionó ninguna tecla
-    jr L21
+        PUSH    BC
+        PUSH    DE
+        
+        CALL    BORRAR_FICHA1           ; Borrar cursor
+        CALL    Animacion_Caeficha      ; Soltar ficha
+        
+        LD      A, (Caracter)
+        CP      'F'                     ; ¿Hay 4 en raya?
+        JR      Z, CAMBIAR_FIN          ; Sí, salir
+        
+        LD      A, (ColumnaFull)
+        CP      1                       ; ¿Columna llena?
+        JP      Z, nohaycambio          ; Sí, repetir turno
+        
+        LD      A, (Color_Usuario)
+        CP      TINTA_Yel               ; ¿Es amarillo?
+        JR      NZ, ES_ROJO_CAMBIO      ; No, cambiar a amarillo
+        
+        LD      A, TINTA_Red            ; Cambiar a rojo
+        LD      (Color_Usuario), A
+        LD      H, 0                    ; Posición inicial
+        LD      L, 0
 
-    RET
-nohaycambio: 
-    xor a
-    ld (ColumnaFull), a
-    LD A, (Color_Usuario)   ; carga el color actual
-    CP TINTA_Yel            ; comparo con amarillo
-    JP NZ, ES_ROJOYNolocambio
-    JP ES_AMARILLOYNolocambio 
+ES_ROJOYNolocambio:
+        CALL    PintaCuadrao1           ; Redibujar cursor rojo
+
+L21:
+        PUSH    BC
+        LD      BC, $DFFE
+        IN      A, (C)                  ; Leer puerto $DFFE
+        
+        BIT     0, A                    ; Comprobar tecla P (derecha)
+        JR      NZ, L22                 ; No pulsada, siguiente
+        CALL    SOLTAR_TECLA
+        LD      A, 'P'
+        LD      (Caracter), A
+        POP     BC
+        CALL    MOVER_DERECHA           ; Mover a la derecha
+        JR      L21                     ; Volver a leer
+
+L22:
+        BIT     1, A                    ; Comprobar tecla O (izquierda)
+        JR      NZ, L23                 ; No pulsada, siguiente
+        CALL    SOLTAR_TECLA
+        LD      A, 'O'
+        LD      (Caracter), A
+        POP     BC
+        CALL    MOVER_IZQUIERDA         ; Mover a la izquierda
+        JR      L21                     ; Volver a leer
+
+L23:
+        LD      BC, $FDFE
+        IN      A, (C)                  ; Leer puerto $FDFE
+        BIT     3, A                    ; Comprobar tecla F
+        JR      NZ, L24                 ; No pulsada, siguiente
+        CALL    SOLTAR_TECLA
+        LD      A, 'F'
+        LD      (Caracter), A
+        POP     BC
+        JR      CAMBIAR_FIN             ; Finalizar
+
+L24:
+        LD      BC, $BFFE
+        IN      A, (C)                  ; Leer puerto $BFFE
+        BIT     0, A                    ; Comprobar ENTER
+        JR      NZ, L25                 ; No pulsada, seguir
+        CALL    SOLTAR_TECLA
+        LD      A, $FF                  ; Código especial ENTER
+        LD      (Caracter), A
+        POP     BC
+        POP     DE
+        POP     BC
+        JP      CAMBIAR_USUARIO         ; Procesar soltar ficha
+
+L25:
+        POP     BC                      ; Ninguna tecla
+        JR      L21                     ; Seguir leyendo
+
+;ES_ROJO_CAMBIO: Salta a preparación del otro jugador
+ES_ROJO_CAMBIO:
+        POP     DE
+        POP     BC
+        JP      ES_ROJO                 ; Preparar turno rojo
+
+;CAMBIAR_FIN: Finaliza secuencia de cambio
+CAMBIAR_FIN:
+        POP     DE
+        POP     BC
+        RET
+
+;nohaycambio: Repite turno si la columna estaba llena
+nohaycambio:
+        XOR     A                       ; Limpiar flag de columna llena
+        LD      (ColumnaFull), A
+        LD      A, (Color_Usuario)
+        CP      TINTA_Yel               ; ¿Es amarillo?
+        JP      NZ, ES_ROJOYNolocambio  ; No, es rojo
+        POP     DE
+        POP     BC
+        JP      ES_AMARILLOYNolocambio  ; Sí, es amarillo 

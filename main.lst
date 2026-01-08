@@ -1,1596 +1,1649 @@
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\main.asm
-  1   0000                     DEVICE ZXSPECTRUM48
-  2   0000                     SLDOPT COMMENT WPMEM, LOGPOINT, ASSETION
-  3   0000                     org $8000               ; Programa ubicado a partir de $8000 = 32768
-  4   8000 31 00 00            ld sp, 0
-  5   8003 C3 FE 9B            jp inicio
-  6   8006              portada: INCBIN "portada.scr"
-  7   9B06
-  8   9B06              M_WL:
-  9   9B06 42 69 65 6E         DB "Bienvenido al Conecta 4", 0
-  9   9B0A 76 65 6E 69
-  9   9B0E 64 6F 20 61
-  9   9B12 6C 20 43 6F
-  9   9B16 6E 65 63 74
-  9   9B1A 61 20 34 00
- 10   9B1E              M_PR:
- 11   9B1E 51 75 69 65         DB "Quieres jugar?", 0
- 11   9B22 72 65 73 20
- 11   9B26 6A 75 67 61
- 11   9B2A 72 3F 00
- 12   9B2D              M_GB:
- 13   9B2D 41 64 69 6F         DB "Adios!!!!", 0
- 13   9B31 73 21 21 21
- 13   9B35 21 00
- 14   9B37              M_RS:
- 15   9B37 00 00               DB 0,0
- 16   9B39              M_PF:
- 17   9B39 4C 61 20 70         DB "La partida ha finalizado  ", 0
- 17   9B3D 61 72 74 69
- 17   9B41 64 61 20 68
- 17   9B45 61 20 66 69
- 17   9B49 6E 61 6C 69
- 17   9B4D 7A 61 64 6F
- 17   9B51 20 20 00
- 18   9B54              M_QJ:
- 19   9B54 51 75 69 65         DB "Quieres jugar otra partida? ", 0
- 19   9B58 72 65 73 20
- 19   9B5C 6A 75 67 61
- 19   9B60 72 20 6F 74
- 19   9B64 72 61 20 70
- 19   9B68 61 72 74 69
- 19   9B6C 64 61 3F 20
- 19   9B70 00
- 20   9B71              M_GAN_AMARILLO:
- 21   9B71 47 61 6E 61         DB "Ganador: Amarillo", 0
- 21   9B75 64 6F 72 3A
- 21   9B79 20 41 6D 61
- 21   9B7D 72 69 6C 6C
- 21   9B81 6F 00
- 22   9B83              M_GAN_ROJO:
- 23   9B83 47 61 6E 61         DB "Ganador: Rojo", 0
- 23   9B87 64 6F 72 3A
- 23   9B8B 20 52 6F 6A
- 23   9B8F 6F 00
- 24   9B91              M_TABLAS:
- 25   9B91 54 61 62 6C         DB "Tablas", 0
- 25   9B95 61 73 00
- 26   9B98 00           FullTablero DB 0
- 27   9B99 00           ContadorFichas DB 0
- 28   9B9A 00           Ganador DB 0          ; 0=tablas, TINTA_Yel=amarillo, TINTA_Red=rojo
- 29   9B9B 00           ColumnaFull db 0
- 30   9B9C 00           Caracter DB 0
- 31   9B9D              PAPEL_Azul EQU 1*8
- 32   9B9D              TINTA_Yel EQU 6
- 33   9B9D              TINTA_Red EQU 2
- 34   9B9D              TINTA_Blck EQU 0
- 35   9B9D 06           Color_Usuario db TINTA_Yel
- 36   9B9E              POS_MAX EQU $3A ;$5839 EN ATRIBUTOS (+24)
- 37   9B9E              POS_MIN EQU $20 ;$5821
- 38   9B9E              ;nuevas pos max
- 39   9B9E              POS_MAX1 EQU 6 ;$5839 EN ATRIBUTOS , en fila 7 en L
- 40   9B9E              POS_MIN1 EQU 0 ;columna inicial en atributos
- 41   9B9E              Posiciones:
- 42   9B9E 00 00 00 00         db 0,0,0,0,0,0,0
- 42   9BA2 00 00 00
- 43   9BA5 00 00 00 00         db 0,0,0,0,0,0,0
- 43   9BA9 00 00 00
- 44   9BAC 00 00 00 00         db 0,0,0,0,0,0,0
- 44   9BB0 00 00 00
- 45   9BB3 00 00 00 00         db 0,0,0,0,0,0,0
- 45   9BB7 00 00 00
- 46   9BBA 00 00 00 00         db 0,0,0,0,0,0,0
- 46   9BBE 00 00 00
- 47   9BC1 00 00 00 00         db 0,0,0,0,0,0,0
- 47   9BC5 00 00 00
- 48   9BC8              Posiciones1:; poner $ff, cambiar rutina limpieza
- 49   9BC8 FF 00 00 00         db $ff,0,0,0,0,0,0,0,$ff
- 49   9BCC 00 00 00 00
- 49   9BD0 FF
- 50   9BD1 FF 00 00 00         db $ff,0,0,0,0,0,0,0,$ff
- 50   9BD5 00 00 00 00
- 50   9BD9 FF
- 51   9BDA FF 00 00 00         db $ff,0,0,0,0,0,0,0,$ff
- 51   9BDE 00 00 00 00
- 51   9BE2 FF
- 52   9BE3 FF 00 00 00         db $ff,0,0,0,0,0,0,0,$ff
- 52   9BE7 00 00 00 00
- 52   9BEB FF
- 53   9BEC FF 00 00 00         db $ff,0,0,0,0,0,0,0,$ff
- 53   9BF0 00 00 00 00
- 53   9BF4 FF
- 54   9BF5 FF 00 00 00         db $ff,0,0,0,0,0,0,0,$ff
- 54   9BF9 00 00 00 00
- 54   9BFD FF
- 55   9BFE
- 56   9BFE              ;recomendado usar DE para color y n.judador con EXX para ir cambiando
- 57   9BFE              inicio:
- 58   9BFE
- 59   9BFE 3E 00               LD A, 0
- 60   9C00 D3 FE               OUT ($FE), A
- 61   9C02 CD D5 9C            CALL CLEARSCR
- 62   9C05 CD BF A0            CALL IMPORT_DRAW
- 63   9C08 06 00               LD B, 0
- 64   9C0A 0E 05               LD C, 5
- 65   9C0C 3E 42               LD A, 2+0*8+64
- 66   9C0E DD 21 06 9B         LD IX, M_WL
- 67   9C12 CD 64 9C            CALL PRINTAT
- 68   9C15
- 69   9C15 3E 06               LD A, 6
- 70   9C17 06 14               LD B, 20
- 71   9C19 0E 01               LD C, 1
- 72   9C1B DD 21 1E 9B         LD IX, M_PR
- 73   9C1F CD 64 9C            CALL PRINTAT
- 74   9C22 3E B0               LD A, 6*8+128
- 75   9C24 32 90 5A            LD ($5800+20*32+16), A
- 76   9C27
- 77   9C27 CD C0 A6            CALL LEER_SN
- 78   9C2A 20 37               JR NZ, fin
- 79   9C2C CD 3F A5            CALL JUEGO ;al salir la primera vez con F baja a jugar nuevamente.
- 80   9C2F
- 81   9C2F              JUGAR_NUEVAMENTE:  ; empieza limpiando e imprimiendo los dos textos de la pantalla
- 82   9C2F 3E 00               LD A, 0
- 83   9C31 D3 FE               OUT ($FE), A
- 84   9C33 CD D5 9C            CALL CLEARSCR
- 85   9C36 06 01               LD B, 1
- 86   9C38 0E 05               LD C, 5
- 87   9C3A 3E 01               LD A, 1
- 88   9C3C DD 21 39 9B         LD IX, M_PF
- 89   9C40 CD 64 9C            CALL PRINTAT
- 90   9C43
- 91   9C43                     ; Mostrar resultado de la partida
- 92   9C43 CD 4B A6            CALL MostrarResultado
- 93   9C46
- 94   9C46 3E 06               LD A, 6
- 95   9C48 06 0C               LD B, 12
- 96   9C4A 0E 01               LD C, 1
- 97   9C4C DD 21 54 9B         LD IX, M_QJ
- 98   9C50 CD 64 9C            CALL PRINTAT
- 99   9C53 3E B0               LD A, 6*8+128
-100   9C55 32 9E 59            LD ($5800+12*32+30), A
-101   9C58 CD C0 A6            CALL LEER_SN     ; hace la funcion nuevamente de la pantalla inicial
-102   9C5B 20 06               JR NZ, fin
-103   9C5D
-104   9C5D CD 3F A5            CALL JUEGO
-105   9C60 C3 2F 9C            JP JUGAR_NUEVAMENTE
-106   9C63              fin:
-107   9C63 76                  HALT
-108   9C64
-109   9C64                      INCLUDE "PRINTAT.asm"
+  1   0000              ;===============================================================================
+  2   0000              ; CONECTA 4 - Juego para ZX Spectrum 48K
+  3   0000              ;===============================================================================
+  4   0000              ; Descripcion  : Juego de 4 en raya para dos jugadores
+  5   0000              ; Plataforma   : ZX Spectrum 48K
+  6   0000              ; Ensamblador  : SJAsmPlus
+  7   0000              ;===============================================================================
+  8   0000
+  9   0000                      DEVICE ZXSPECTRUM48
+ 10   0000                      SLDOPT COMMENT WPMEM, LOGPOINT, ASSETION
+ 11   0000                      ORG     $8000                   ; Programa ubicado a partir de $8000 = 32768
+ 12   8000 31 00 00             LD      SP, 0                   ; Inicializar pila
+ 13   8003 C3 D2 9B             JP      inicio                  ; Saltar a punto de entrada principal
+ 14   8006
+ 15   8006              ;===============================================================================
+ 16   8006              ; SECCION DE DATOS - Recursos externos
+ 17   8006              ;===============================================================================
+ 18   8006              portada:        INCBIN "portada.scr"
+ 19   9B06
+ 20   9B06              ;===============================================================================
+ 21   9B06              ; SECCION DE DATOS - Cadenas de texto
+ 22   9B06              ;===============================================================================
+ 23   9B06 42 69 65 6E  M_WL:           DB "Bienvenido al Conecta 4", 0
+ 23   9B0A 76 65 6E 69
+ 23   9B0E 64 6F 20 61
+ 23   9B12 6C 20 43 6F
+ 23   9B16 6E 65 63 74
+ 23   9B1A 61 20 34 00
+ 24   9B1E 51 75 69 65  M_PR:           DB "Quieres jugar?", 0
+ 24   9B22 72 65 73 20
+ 24   9B26 6A 75 67 61
+ 24   9B2A 72 3F 00
+ 25   9B2D 41 64 69 6F  M_GB:           DB "Adios!!!!", 0
+ 25   9B31 73 21 21 21
+ 25   9B35 21 00
+ 26   9B37 4C 61 20 70  M_PF:           DB "La partida ha finalizado  ", 0
+ 26   9B3B 61 72 74 69
+ 26   9B3F 64 61 20 68
+ 26   9B43 61 20 66 69
+ 26   9B47 6E 61 6C 69
+ 26   9B4B 7A 61 64 6F
+ 26   9B4F 20 20 00
+ 27   9B52 51 75 69 65  M_QJ:           DB "Quieres jugar otra partida? ", 0
+ 27   9B56 72 65 73 20
+ 27   9B5A 6A 75 67 61
+ 27   9B5E 72 20 6F 74
+ 27   9B62 72 61 20 70
+ 27   9B66 61 72 74 69
+ 27   9B6A 64 61 3F 20
+ 27   9B6E 00
+ 28   9B6F 47 61 6E 61  M_GAN_AMARILLO: DB "Ganador: Amarillo", 0
+ 28   9B73 64 6F 72 3A
+ 28   9B77 20 41 6D 61
+ 28   9B7B 72 69 6C 6C
+ 28   9B7F 6F 00
+ 29   9B81 47 61 6E 61  M_GAN_ROJO:     DB "Ganador: Rojo", 0
+ 29   9B85 64 6F 72 3A
+ 29   9B89 20 52 6F 6A
+ 29   9B8D 6F 00
+ 30   9B8F 54 61 62 6C  M_TABLAS:       DB "Tablas", 0
+ 30   9B93 61 73 00
+ 31   9B96
+ 32   9B96              ;===============================================================================
+ 33   9B96              ; SECCION DE DATOS - Variables de estado del juego
+ 34   9B96              ;===============================================================================
+ 35   9B96 00           FullTablero:    DB 0                    ; Flag: 1 = tablero lleno
+ 36   9B97 00           ContadorFichas: DB 0                    ; Contador de fichas colocadas (max 42)
+ 37   9B98 00           Ganador:        DB 0                    ; 0=tablas, TINTA_Yel=amarillo, TINTA_Red=rojo
+ 38   9B99 00           ColumnaFull:    DB 0                    ; Flag: 1 = columna actual llena
+ 39   9B9A 00           Caracter:       DB 0                    ; Ultimo caracter leido del teclado
+ 40   9B9B
+ 41   9B9B              ;===============================================================================
+ 42   9B9B              ; SECCION DE DATOS - Constantes de colores (atributos ZX Spectrum)
+ 43   9B9B              ;===============================================================================
+ 44   9B9B              PAPEL_Azul      EQU 1*8                 ; Papel azul (bits 3-5)
+ 45   9B9B              TINTA_Yel       EQU 6                   ; Tinta amarilla (bits 0-2)
+ 46   9B9B              TINTA_Red       EQU 2                   ; Tinta roja (bits 0-2)
+ 47   9B9B              TINTA_Blck      EQU 0                   ; Tinta negra (bits 0-2)
+ 48   9B9B
+ 49   9B9B              ;===============================================================================
+ 50   9B9B              ; SECCION DE DATOS - Variables de control del jugador
+ 51   9B9B              ;===============================================================================
+ 52   9B9B 06           Color_Usuario:  DB TINTA_Yel            ; Color del jugador actual
+ 53   9B9C
+ 54   9B9C              ;===============================================================================
+ 55   9B9C              ; SECCION DE DATOS - Constantes de posicion
+ 56   9B9C              ;===============================================================================
+ 57   9B9C              POS_MAX1        EQU 6                   ; Columna maxima (0-6)
+ 58   9B9C              POS_MIN1        EQU 0                   ; Columna minima (0-6)
+ 59   9B9C
+ 60   9B9C              ;===============================================================================
+ 61   9B9C              ; SECCION DE DATOS - Array del tablero con bordes (9 bytes x 6 filas)
+ 62   9B9C              ; Estructura: $FF | 7 columnas | $FF (bordes para deteccion de limites)
+ 63   9B9C              ;===============================================================================
+ 64   9B9C              Posiciones1:
+ 65   9B9C FF 00 00 00          DB $FF,0,0,0,0,0,0,0,$FF
+ 65   9BA0 00 00 00 00
+ 65   9BA4 FF
+ 66   9BA5 FF 00 00 00          DB $FF,0,0,0,0,0,0,0,$FF
+ 66   9BA9 00 00 00 00
+ 66   9BAD FF
+ 67   9BAE FF 00 00 00          DB $FF,0,0,0,0,0,0,0,$FF
+ 67   9BB2 00 00 00 00
+ 67   9BB6 FF
+ 68   9BB7 FF 00 00 00          DB $FF,0,0,0,0,0,0,0,$FF
+ 68   9BBB 00 00 00 00
+ 68   9BBF FF
+ 69   9BC0 FF 00 00 00          DB $FF,0,0,0,0,0,0,0,$FF
+ 69   9BC4 00 00 00 00
+ 69   9BC8 FF
+ 70   9BC9 FF 00 00 00          DB $FF,0,0,0,0,0,0,0,$FF
+ 70   9BCD 00 00 00 00
+ 70   9BD1 FF
+ 71   9BD2
+ 72   9BD2              ;inicio: Punto de entrada y menú principal
+ 73   9BD2              inicio:
+ 74   9BD2 3E 00                LD      A, 0
+ 75   9BD4 D3 FE                OUT     ($FE), A                ; Establecer borde negro
+ 76   9BD6 CD A9 9C             CALL    CLEARSCR                ; Limpiar pantalla
+ 77   9BD9 CD 8A A0             CALL    IMPORT_DRAW             ; Dibujar portada
+ 78   9BDC
+ 79   9BDC 06 00                LD      B, 0                    ; Fila 0
+ 80   9BDE 0E 05                LD      C, 5                    ; Columna 5
+ 81   9BE0 3E 42                LD      A, 2+0*8+64             ; Atributo: tinta roja, bright
+ 82   9BE2 DD 21 06 9B          LD      IX, M_WL
+ 83   9BE6 CD 38 9C             CALL    PRINTAT                 ; Mostrar "Bienvenido al Conecta 4"
+ 84   9BE9
+ 85   9BE9 3E 06                LD      A, 6                    ; Atributo: tinta amarilla
+ 86   9BEB 06 14                LD      B, 20                   ; Fila 20
+ 87   9BED 0E 01                LD      C, 1                    ; Columna 1
+ 88   9BEF DD 21 1E 9B          LD      IX, M_PR
+ 89   9BF3 CD 38 9C             CALL    PRINTAT                 ; Mostrar "Quieres jugar?"
+ 90   9BF6
+ 91   9BF6 3E B0                LD      A, 6*8+128              ; Atributo con flash
+ 92   9BF8 32 90 5A             LD      ($5800+20*32+16), A     ; Marcar cursor
+ 93   9BFB
+ 94   9BFB CD FF A5             CALL    LEER_SN                 ; Esperar respuesta S/N
+ 95   9BFE 20 37                JR      NZ, fin                 ; Si N, terminar
+ 96   9C00 CD 68 A4             CALL    JUEGO                   ; Iniciar juego
+ 97   9C03
+ 98   9C03              ;JUGAR_NUEVAMENTE: Bucle para repetir partidas y mostrar resultado
+ 99   9C03              JUGAR_NUEVAMENTE:
+100   9C03 3E 00                LD      A, 0
+101   9C05 D3 FE                OUT     ($FE), A                ; Borde negro
+102   9C07 CD A9 9C             CALL    CLEARSCR
+103   9C0A
+104   9C0A 06 01                LD      B, 1                    ; Fila 1
+105   9C0C 0E 05                LD      C, 5                    ; Columna 5
+106   9C0E 3E 01                LD      A, 1                    ; Atributo: tinta azul
+107   9C10 DD 21 37 9B          LD      IX, M_PF
+108   9C14 CD 38 9C             CALL    PRINTAT                 ; "La partida ha finalizado"
+109   9C17
+110   9C17 CD 84 A5             CALL    MostrarResultado        ; Mostrar ganador o tablas
+111   9C1A
+112   9C1A 3E 06                LD      A, 6                    ; Atributo: tinta amarilla
+113   9C1C 06 0C                LD      B, 12                   ; Fila 12
+114   9C1E 0E 01                LD      C, 1                    ; Columna 1
+115   9C20 DD 21 52 9B          LD      IX, M_QJ
+116   9C24 CD 38 9C             CALL    PRINTAT                 ; "Quieres jugar otra partida?"
+117   9C27
+118   9C27 3E B0                LD      A, 6*8+128
+119   9C29 32 9E 59             LD      ($5800+12*32+30), A     ; Marcar cursor
+120   9C2C
+121   9C2C CD FF A5             CALL    LEER_SN                 ; Esperar respuesta S/N
+122   9C2F 20 06                JR      NZ, fin                 ; Si N, terminar
+123   9C31
+124   9C31 CD 68 A4             CALL    JUEGO                   ; Nueva partida
+125   9C34 C3 03 9C             JP      JUGAR_NUEVAMENTE        ; Bucle de juego
+126   9C37
+127   9C37              ;fin: Finaliza la ejecución del programa
+128   9C37              fin:
+129   9C37 76                   HALT
+130   9C38
+131   9C38              ;Incluye módulos del programa
+132   9C38                      INCLUDE "PRINTAT.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\PRINTAT.asm
-  1+  9C64              ; -------------------------------
-  2+  9C64              ; ZX Spectrum Text print library
-  3+  9C64              ; Daniel León - AOC - UFV 2020
-  4+  9C64              ; -------------------------------
-  5+  9C64
-  6+  9C64
-  7+  9C64              ; ----------------------------------------------------------------------------------------
-  8+  9C64              ; PRINTAT - Print a string in a position and attributes as per registers:
-  9+  9C64              ;		IN	A	: Bit 7=1 For Flash / Bit 6=1 For Brigh / Bit 5,4,3 for Paper / Bit 2,1,0 for Ink
- 10+  9C64              ;		IN	B	: Row 0..23
- 11+  9C64              ;		IN	C	: Column 0..31
- 12+  9C64              ;		IN	IX	: Address of text (Text must end in a 0)
- 13+  9C64              ; ----------------------------------------------------------------------------------------
- 14+  9C64 CD 73 9C     PRINTAT:	CALL PREP_PRT				; Update Attribute var &Screen & Attributes pointers
- 15+  9C67              ; ----------------------------------------------------------------------------------------
- 16+  9C67              ;		VVV Do not move PRINTSTR below as PRINTAT continues into PRINTSTR routine
- 17+  9C67              ; ----------------------------------------------------------------------------------------
- 18+  9C67              ; PRINTSTR - Prints String - IX Points to the String start
- 19+  9C67              ; ----------------------------------------------------------------------------------------
- 20+  9C67 DD 7E 00     PRINTSTR:   LD A,(IX)					; A Contains first char to print
- 21+  9C6A B7           			OR A						; check for end of string (0)
- 22+  9C6B C8           			RET Z						; Finish printing if 0
- 23+  9C6C CD A1 9C     			CALL PRINTCHNUM
- 24+  9C6F DD 23        			INC IX						; Move to next char in string
- 25+  9C71 18 F4        			JR PRINTSTR					; Start over printing sequence
- 26+  9C73              ; ----------------------------------------------------------------------------------------
- 27+  9C73
- 28+  9C73
- 29+  9C73              ;-----------------------------------------------------------------------------------------
- 30+  9C73              ; PREP_PRT - Updates Print_Attr, SCR & ATTR Vars
- 31+  9C73              ;-----------------------------------------------------------------------------------------
- 32+  9C73 32 E7 9C     PREP_PRT:	LD (PRINT_ATTR),A			; Set Attribute
- 33+  9C76 CD 7C 9C     PREP_PRT_2:	CALL CRtoSCREEN
- 34+  9C79 C3 8E 9C     			JP CRtoATTR
- 35+  9C7C              ;-----------------------------------------------------------------------------------------
- 36+  9C7C
- 37+  9C7C              ;-----------------------------------------------------------------------------------------
- 38+  9C7C              ; CRtoSCREEN - Converts a scr char coord into a SCREEN Address   b,c = y,x positions
- 39+  9C7C              ;	IN  - B=Row, C=Column
- 40+  9C7C              ;	OUT - HL=Address in screen also stored in (SCR_CUR_PTR)
- 41+  9C7C              ;	Conversion:
- 42+  9C7C              ;			Row FFfff   Column CCCCC
- 43+  9C7C              ;			HL=%010FF000 fffCCCCC
- 44+  9C7C              ;-----------------------------------------------------------------------------------------
- 45+  9C7C              CRtoSCREEN:
- 46+  9C7C 78           			LD A,B						; %___FFfff
- 47+  9C7D F6 40        			OR #40						; %010FFfff
- 48+  9C7F E6 F8        			AND #F8						; %010FF000
- 49+  9C81 67           			LD H,A
- 50+  9C82
- 51+  9C82 78           			LD A,B						; %___FFfff
- 52+  9C83 E6 07        			AND #7						; %00000fff
- 53+  9C85 0F           			RRCA						; %f00000ff
- 54+  9C86 0F           			RRCA						; %ff00000f
- 55+  9C87 0F           			RRCA						; %fff00000
- 56+  9C88 B1           			OR C						; %fffCCCCC
- 57+  9C89 6F           			LD L,A
- 58+  9C8A 22 E3 9C                 LD (SCR_CUR_PTR),HL			; Update Variable
- 59+  9C8D C9                       RET
- 60+  9C8E              ; ----------------------------------------------------------------------------------------
- 61+  9C8E
- 62+  9C8E
- 63+  9C8E
- 64+  9C8E              ;-----------------------------------------------------------------------------------------
- 65+  9C8E              ; CRtoATTR - Converts a screen char coord  into a ATTR Address  b,c = y,x positions
- 66+  9C8E              ;	IN  - B=Row, C=Column
- 67+  9C8E              ;	OUT - HL=Address in screen also stored in (SCR_ATTR_PTR)
- 68+  9C8E              ;	Conversion:
- 69+  9C8E              ;			Row FFfff   Column CCCCC
- 70+  9C8E              ;			HL=%010110FF fffCCCCC
- 71+  9C8E              ;-----------------------------------------------------------------------------------------
- 72+  9C8E              CRtoATTR:
- 73+  9C8E 78           			LD A,B						; %___FFfff
- 74+  9C8F 0F           			RRCA						; %f000FFff
- 75+  9C90 0F           			RRCA						; %ff000FFf
- 76+  9C91 0F           			RRCA						; %fff000FF
- 77+  9C92 6F           			LD L,A
- 78+  9C93 E6 03        			AND 3						; %000000FF	value of FF can be only 00,01,10
- 79+  9C95 F6 58        			OR #58						; %010110FF value will be #58, #59 or #5A
- 80+  9C97 67           			LD H,A
- 81+  9C98
- 82+  9C98 7D           			LD A,L						; %fff000FF
- 83+  9C99 E6 E0        			AND #E0						; %fff00000
- 84+  9C9B B1           			OR C						; %fffCCCCC
- 85+  9C9C 6F           			LD L,A
- 86+  9C9D
- 87+  9C9D 22 E5 9C                 LD (SCR_ATTR_PTR),HL		; Update Variable
- 88+  9CA0 C9                       RET
- 89+  9CA1              ; ----------------------------------------------------------------------------------------
- 90+  9CA1
- 91+  9CA1
- 92+  9CA1
- 93+  9CA1              ; ----------------------------------------------------------------------------------------
- 94+  9CA1              ; PRINTCHNUM - Prints Char Number N (stored in A)
- 95+  9CA1              ;-----------------------------------------------------------------------------------------
- 96+  9CA1              PRINTCHNUM:	;SUB 32						; Adjust Ascii to charset
- 97+  9CA1 26 00        			LD H,0						; Multiply value by 8 to get to right Char in Charset
- 98+  9CA3 6F           			LD L,A
- 99+  9CA4 29           			ADD HL,HL
-100+  9CA5 29           			ADD HL,HL
-101+  9CA6 29           			ADD HL,HL
-102+  9CA7 11 E8 9B     			LD DE, CHARSET-(8*32)		; Optimize in compile time (instead of sub 32)
-103+  9CAA 19           			ADD HL,DE
-104+  9CAB EB           			EX  DE,HL					;Value in DE
-105+  9CAC              			; Continues to printchar below
-106+  9CAC              ; ----------------------------------------------------------------------------------------
-107+  9CAC
-108+  9CAC
-109+  9CAC              ; ----------------------------------------------------------------------------------------
-110+  9CAC              ; PRINTCHAR - Prints Char  (DE points to the char. Uses HL as last Cur Pointer)
-111+  9CAC              ; ----------------------------------------------------------------------------------------
-112+  9CAC              PRINTCHAR:
-113+  9CAC 06 08        			LD B,8						; 8 Lines per char
-114+  9CAE 2A E3 9C                 LD HL, (SCR_CUR_PTR)		; Load Cursor Pointer y,x
-115+  9CB1
-116+  9CB1 1A           BYTEPCHAR:	LD A,(DE)					; Get Char to be printed, first line
-117+  9CB2 77           			LD (HL),A					; Move to Printing location
-118+  9CB3 24                       INC H						; inc H so next line in char (ZX Spectrum Screen RAM)
-119+  9CB4 13                       INC DE 						; next line to be printed
-120+  9CB5 10 FA                    DJNZ BYTEPCHAR				; Repeat 8 lines
-121+  9CB7 3A E7 9C                 LD A,(PRINT_ATTR) 			; Load Attributes to print char with
-122+  9CBA 2A E5 9C                 LD HL, (SCR_ATTR_PTR)
-123+  9CBD 77                       LD (HL),A
-124+  9CBE 21 E5 9C                 LD HL, SCR_ATTR_PTR			; Get pointer to ATTR
-125+  9CC1 34                       INC (HL)					; Move Attribute cursor to next char
-126+  9CC2 21 E3 9C     			LD HL, SCR_CUR_PTR
-127+  9CC5 34           			INC (HL)					; update Cursor pointer to next position
-128+  9CC6 C9                       RET
-129+  9CC7              ; ----------------------------------------------------------------------------------------
-130+  9CC7
-131+  9CC7
-132+  9CC7
-133+  9CC7              ; ----------------------------------------------------------------------------------------
-134+  9CC7              ; INK2PAPER - moves ink of attribute stored in (PRINT_ATTR) to paper and sets ink to 0
-135+  9CC7              ; 				Sets bright 1 and flash 0
-136+  9CC7              ; ----------------------------------------------------------------------------------------
-137+  9CC7 3A E7 9C     INK2PAPER:	LD A, (PRINT_ATTR)		    ; Get storedAttribute
-138+  9CCA E6 07                    AND 7						; get Attr INK in A
-139+  9CCC 07           			RLCA
-140+  9CCD 07           			RLCA
-141+  9CCE 07           			RLCA						; move Ink to Paper
-142+  9CCF F6 40        			OR 64						; ink 0 bright 1
-143+  9CD1 32 E7 9C     			LD (PRINT_ATTR),A		    ; Get storedAttribute
-144+  9CD4 C9           			RET
-145+  9CD5              ; ----------------------------------------------------------------------------------------
-146+  9CD5
-147+  9CD5
-148+  9CD5
-149+  9CD5
-150+  9CD5 21 00 40     CLEARSCR:	LD HL,$4000					; Erases screen by writing 0 to all pixels and attributes
-151+  9CD8 11 01 40     			LD DE,$4001
-152+  9CDB 01 FF 1A     			LD BC,6911
-153+  9CDE 36 00        			LD (HL),0
-154+  9CE0 ED B0        			LDIR
-155+  9CE2 C9           			RET
-156+  9CE3
-157+  9CE3
-158+  9CE3              SCR_CUR_PTR
-158+  9CE3 00 00          	db $00, $00				; Cursor Pointer in Screen (2 bytes) (HL)
-159+  9CE5 00 00        SCR_ATTR_PTR: 	db $00, $00				; Attr Pointer in Screen (2 bytes) (HL)
-160+  9CE7 00           PRINT_ATTR:		db $00					; Attribute used by printchar routine (1 byte)
-161+  9CE8
-162+  9CE8              CHARSET: incbin "charset.bin"			; Charset used
-163+  9FE8
+  1+  9C38              ; -------------------------------
+  2+  9C38              ; ZX Spectrum Text print library
+  3+  9C38              ; Daniel León - AOC - UFV 2020
+  4+  9C38              ; -------------------------------
+  5+  9C38
+  6+  9C38
+  7+  9C38              ; ----------------------------------------------------------------------------------------
+  8+  9C38              ; PRINTAT - Print a string in a position and attributes as per registers:
+  9+  9C38              ;		IN	A	: Bit 7=1 For Flash / Bit 6=1 For Brigh / Bit 5,4,3 for Paper / Bit 2,1,0 for Ink
+ 10+  9C38              ;		IN	B	: Row 0..23
+ 11+  9C38              ;		IN	C	: Column 0..31
+ 12+  9C38              ;		IN	IX	: Address of text (Text must end in a 0)
+ 13+  9C38              ; ----------------------------------------------------------------------------------------
+ 14+  9C38 CD 47 9C     PRINTAT:	CALL PREP_PRT				; Update Attribute var &Screen & Attributes pointers
+ 15+  9C3B              ; ----------------------------------------------------------------------------------------
+ 16+  9C3B              ;		VVV Do not move PRINTSTR below as PRINTAT continues into PRINTSTR routine
+ 17+  9C3B              ; ----------------------------------------------------------------------------------------
+ 18+  9C3B              ; PRINTSTR - Prints String - IX Points to the String start
+ 19+  9C3B              ; ----------------------------------------------------------------------------------------
+ 20+  9C3B DD 7E 00     PRINTSTR:   LD A,(IX)					; A Contains first char to print
+ 21+  9C3E B7           			OR A						; check for end of string (0)
+ 22+  9C3F C8           			RET Z						; Finish printing if 0
+ 23+  9C40 CD 75 9C     			CALL PRINTCHNUM
+ 24+  9C43 DD 23        			INC IX						; Move to next char in string
+ 25+  9C45 18 F4        			JR PRINTSTR					; Start over printing sequence
+ 26+  9C47              ; ----------------------------------------------------------------------------------------
+ 27+  9C47
+ 28+  9C47
+ 29+  9C47              ;-----------------------------------------------------------------------------------------
+ 30+  9C47              ; PREP_PRT - Updates Print_Attr, SCR & ATTR Vars
+ 31+  9C47              ;-----------------------------------------------------------------------------------------
+ 32+  9C47 32 BB 9C     PREP_PRT:	LD (PRINT_ATTR),A			; Set Attribute
+ 33+  9C4A CD 50 9C     PREP_PRT_2:	CALL CRtoSCREEN
+ 34+  9C4D C3 62 9C     			JP CRtoATTR
+ 35+  9C50              ;-----------------------------------------------------------------------------------------
+ 36+  9C50
+ 37+  9C50              ;-----------------------------------------------------------------------------------------
+ 38+  9C50              ; CRtoSCREEN - Converts a scr char coord into a SCREEN Address   b,c = y,x positions
+ 39+  9C50              ;	IN  - B=Row, C=Column
+ 40+  9C50              ;	OUT - HL=Address in screen also stored in (SCR_CUR_PTR)
+ 41+  9C50              ;	Conversion:
+ 42+  9C50              ;			Row FFfff   Column CCCCC
+ 43+  9C50              ;			HL=%010FF000 fffCCCCC
+ 44+  9C50              ;-----------------------------------------------------------------------------------------
+ 45+  9C50              CRtoSCREEN:
+ 46+  9C50 78           			LD A,B						; %___FFfff
+ 47+  9C51 F6 40        			OR #40						; %010FFfff
+ 48+  9C53 E6 F8        			AND #F8						; %010FF000
+ 49+  9C55 67           			LD H,A
+ 50+  9C56
+ 51+  9C56 78           			LD A,B						; %___FFfff
+ 52+  9C57 E6 07        			AND #7						; %00000fff
+ 53+  9C59 0F           			RRCA						; %f00000ff
+ 54+  9C5A 0F           			RRCA						; %ff00000f
+ 55+  9C5B 0F           			RRCA						; %fff00000
+ 56+  9C5C B1           			OR C						; %fffCCCCC
+ 57+  9C5D 6F           			LD L,A
+ 58+  9C5E 22 B7 9C                 LD (SCR_CUR_PTR),HL			; Update Variable
+ 59+  9C61 C9                       RET
+ 60+  9C62              ; ----------------------------------------------------------------------------------------
+ 61+  9C62
+ 62+  9C62
+ 63+  9C62
+ 64+  9C62              ;-----------------------------------------------------------------------------------------
+ 65+  9C62              ; CRtoATTR - Converts a screen char coord  into a ATTR Address  b,c = y,x positions
+ 66+  9C62              ;	IN  - B=Row, C=Column
+ 67+  9C62              ;	OUT - HL=Address in screen also stored in (SCR_ATTR_PTR)
+ 68+  9C62              ;	Conversion:
+ 69+  9C62              ;			Row FFfff   Column CCCCC
+ 70+  9C62              ;			HL=%010110FF fffCCCCC
+ 71+  9C62              ;-----------------------------------------------------------------------------------------
+ 72+  9C62              CRtoATTR:
+ 73+  9C62 78           			LD A,B						; %___FFfff
+ 74+  9C63 0F           			RRCA						; %f000FFff
+ 75+  9C64 0F           			RRCA						; %ff000FFf
+ 76+  9C65 0F           			RRCA						; %fff000FF
+ 77+  9C66 6F           			LD L,A
+ 78+  9C67 E6 03        			AND 3						; %000000FF	value of FF can be only 00,01,10
+ 79+  9C69 F6 58        			OR #58						; %010110FF value will be #58, #59 or #5A
+ 80+  9C6B 67           			LD H,A
+ 81+  9C6C
+ 82+  9C6C 7D           			LD A,L						; %fff000FF
+ 83+  9C6D E6 E0        			AND #E0						; %fff00000
+ 84+  9C6F B1           			OR C						; %fffCCCCC
+ 85+  9C70 6F           			LD L,A
+ 86+  9C71
+ 87+  9C71 22 B9 9C                 LD (SCR_ATTR_PTR),HL		; Update Variable
+ 88+  9C74 C9                       RET
+ 89+  9C75              ; ----------------------------------------------------------------------------------------
+ 90+  9C75
+ 91+  9C75
+ 92+  9C75
+ 93+  9C75              ; ----------------------------------------------------------------------------------------
+ 94+  9C75              ; PRINTCHNUM - Prints Char Number N (stored in A)
+ 95+  9C75              ;-----------------------------------------------------------------------------------------
+ 96+  9C75              PRINTCHNUM:	;SUB 32						; Adjust Ascii to charset
+ 97+  9C75 26 00        			LD H,0						; Multiply value by 8 to get to right Char in Charset
+ 98+  9C77 6F           			LD L,A
+ 99+  9C78 29           			ADD HL,HL
+100+  9C79 29           			ADD HL,HL
+101+  9C7A 29           			ADD HL,HL
+102+  9C7B 11 BC 9B     			LD DE, CHARSET-(8*32)		; Optimize in compile time (instead of sub 32)
+103+  9C7E 19           			ADD HL,DE
+104+  9C7F EB           			EX  DE,HL					;Value in DE
+105+  9C80              			; Continues to printchar below
+106+  9C80              ; ----------------------------------------------------------------------------------------
+107+  9C80
+108+  9C80
+109+  9C80              ; ----------------------------------------------------------------------------------------
+110+  9C80              ; PRINTCHAR - Prints Char  (DE points to the char. Uses HL as last Cur Pointer)
+111+  9C80              ; ----------------------------------------------------------------------------------------
+112+  9C80              PRINTCHAR:
+113+  9C80 06 08        			LD B,8						; 8 Lines per char
+114+  9C82 2A B7 9C                 LD HL, (SCR_CUR_PTR)		; Load Cursor Pointer y,x
+115+  9C85
+116+  9C85 1A           BYTEPCHAR:	LD A,(DE)					; Get Char to be printed, first line
+117+  9C86 77           			LD (HL),A					; Move to Printing location
+118+  9C87 24                       INC H						; inc H so next line in char (ZX Spectrum Screen RAM)
+119+  9C88 13                       INC DE 						; next line to be printed
+120+  9C89 10 FA                    DJNZ BYTEPCHAR				; Repeat 8 lines
+121+  9C8B 3A BB 9C                 LD A,(PRINT_ATTR) 			; Load Attributes to print char with
+122+  9C8E 2A B9 9C                 LD HL, (SCR_ATTR_PTR)
+123+  9C91 77                       LD (HL),A
+124+  9C92 21 B9 9C                 LD HL, SCR_ATTR_PTR			; Get pointer to ATTR
+125+  9C95 34                       INC (HL)					; Move Attribute cursor to next char
+126+  9C96 21 B7 9C     			LD HL, SCR_CUR_PTR
+127+  9C99 34           			INC (HL)					; update Cursor pointer to next position
+128+  9C9A C9                       RET
+129+  9C9B              ; ----------------------------------------------------------------------------------------
+130+  9C9B
+131+  9C9B
+132+  9C9B
+133+  9C9B              ; ----------------------------------------------------------------------------------------
+134+  9C9B              ; INK2PAPER - moves ink of attribute stored in (PRINT_ATTR) to paper and sets ink to 0
+135+  9C9B              ; 				Sets bright 1 and flash 0
+136+  9C9B              ; ----------------------------------------------------------------------------------------
+137+  9C9B 3A BB 9C     INK2PAPER:	LD A, (PRINT_ATTR)		    ; Get storedAttribute
+138+  9C9E E6 07                    AND 7						; get Attr INK in A
+139+  9CA0 07           			RLCA
+140+  9CA1 07           			RLCA
+141+  9CA2 07           			RLCA						; move Ink to Paper
+142+  9CA3 F6 40        			OR 64						; ink 0 bright 1
+143+  9CA5 32 BB 9C     			LD (PRINT_ATTR),A		    ; Get storedAttribute
+144+  9CA8 C9           			RET
+145+  9CA9              ; ----------------------------------------------------------------------------------------
+146+  9CA9
+147+  9CA9
+148+  9CA9
+149+  9CA9
+150+  9CA9 21 00 40     CLEARSCR:	LD HL,$4000					; Erases screen by writing 0 to all pixels and attributes
+151+  9CAC 11 01 40     			LD DE,$4001
+152+  9CAF 01 FF 1A     			LD BC,6911
+153+  9CB2 36 00        			LD (HL),0
+154+  9CB4 ED B0        			LDIR
+155+  9CB6 C9           			RET
+156+  9CB7
+157+  9CB7
+158+  9CB7              SCR_CUR_PTR
+158+  9CB7 00 00          	db $00, $00				; Cursor Pointer in Screen (2 bytes) (HL)
+159+  9CB9 00 00        SCR_ATTR_PTR: 	db $00, $00				; Attr Pointer in Screen (2 bytes) (HL)
+160+  9CBB 00           PRINT_ATTR:		db $00					; Attribute used by printchar routine (1 byte)
+161+  9CBC
+162+  9CBC              CHARSET: incbin "charset.bin"			; Charset used
+163+  9FBC
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\PRINTAT.asm
-110   9FE8                      INCLUDE "TABLERO.asm"
+133   9FBC                      INCLUDE "TABLERO.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\TABLERO.asm
-  1+  9FE8
-  2+  9FE8              TABLERO_REDONDO:
-  3+  9FE8 E5                   push hl
-  4+  9FE9 DD E5                push ix
-  5+  9FEB D5                   push de
-  6+  9FEC C5                   push bc
-  7+  9FED F5                   push AF
-  8+  9FEE
-  9+  9FEE CD D5 9C             CALL CLEARSCR
- 10+  9FF1
- 11+  9FF1                      ; Dibujar el fondo del tablero primero
- 12+  9FF1 21 60 58             LD HL, $5800 + 96     ; HL se mueve 3 filas hacia abajo, dejando espacio arriba para ficha amarilla
- 13+  9FF4 E5 DD E1             LD IX,HL
- 14+  9FF7
- 15+  9FF7 3E 08                LD A, 8             ; A = 8, color azul para las barras del tablero
- 16+  9FF9 06 13                LD B, 19            ; B = 19, número de filas
- 17+  9FFB              FullCuadrao:
- 18+  9FFB 0E 1D                LD C, 29
- 19+  9FFD              COLUMNA:
- 20+  9FFD 77                   LD (HL), A          ; Escribe el color azul en HL
- 21+  9FFE 23                   INC HL              ; Avanza HL al siguiente byte
- 22+  9FFF 0D                   DEC C               ; Disminuye contador de columnas
- 23+  A000 20 FB                JR NZ, COLUMNA
- 24+  A002 11 20 00             LD DE, 32
- 25+  A005 DD 19                ADD IX,DE
- 26+  A007 DD E5 E1             LD HL,IX
- 27+  A00A 05                   DEC B
- 28+  A00B 20 EE                JR NZ, FullCuadrao
- 29+  A00D              ; Fila 0: $4021 / $5821
- 30+  A00D 3E 00                LD A, 0
- 31+  A00F 32 9D 9B             LD (Color_Usuario), A
- 32+  A012 DD 21 21 40          LD IX, $4021
- 33+  A016 21 21 58             LD HL, $5821
- 34+  A019 0E 07                LD C, 7
- 35+  A01B
- 36+  A01B              FilaColumnas0:
- 37+  A01B CD D1 A0             CALL FICHA
- 38+  A01E 11 04 00             LD DE, 4
- 39+  A021 DD 19                ADD IX, DE
- 40+  A023 19                   ADD HL, DE
- 41+  A024 0D                   DEC C
- 42+  A025 20 F4                JR NZ, FilaColumnas0
- 43+  A027
- 44+  A027                      ; Fila 2: $40E1 / $5881+96
- 45+  A027 DD 21 E1 40          LD IX, $40E1
- 46+  A02B 21 E1 58             LD HL, $5881 + 96
- 47+  A02E 0E 07                LD C, 7
- 48+  A030              ; Fila 1: $4081 / $5881
- 49+  A030 3E 08                LD A, %00001000     ; pongo la ficha en negro
- 50+  A032 32 9D 9B             LD (Color_Usuario), A
- 51+  A035 DD 21 81 40          LD IX, $4081
- 52+  A039 21 81 58             LD HL, $5881
- 53+  A03C 0E 07                LD C, 7
- 54+  A03E              FilaColumnas1:
- 55+  A03E CD D1 A0             CALL FICHA
- 56+  A041 11 04 00             LD DE, 4
- 57+  A044 DD 19                ADD IX, DE
- 58+  A046 19                   ADD HL, DE
- 59+  A047 0D                   DEC C
- 60+  A048 20 F4                JR NZ, FilaColumnas1
- 61+  A04A
- 62+  A04A                      ; Fila 2: $40E1 / $5881+96
- 63+  A04A DD 21 E1 40          LD IX, $40E1
- 64+  A04E 21 E1 58             LD HL, $5881 + 96
- 65+  A051 0E 07                LD C, 7
- 66+  A053              FilaColumnas2:
- 67+  A053 CD D1 A0             CALL FICHA
- 68+  A056 11 04 00             LD DE, 4
- 69+  A059 DD 19                ADD IX, DE
- 70+  A05B 19                   ADD HL, DE
- 71+  A05C 0D                   DEC C
- 72+  A05D 20 F4                JR NZ, FilaColumnas2
- 73+  A05F
- 74+  A05F                      ; Fila 3: $4841 / $5881+192
- 75+  A05F DD 21 41 48          LD IX, $4841
- 76+  A063 21 41 59             LD HL, $5881 + 192
- 77+  A066 0E 07                LD C, 7
- 78+  A068              FilaColumnas3:
- 79+  A068 CD D1 A0             CALL FICHA
- 80+  A06B 11 04 00             LD DE, 4
- 81+  A06E DD 19                ADD IX, DE
- 82+  A070 19                   ADD HL, DE
- 83+  A071 0D                   DEC C
- 84+  A072 20 F4                JR NZ, FilaColumnas3
- 85+  A074
- 86+  A074                      ; Fila 4: $48A1 / $5881+288
- 87+  A074 DD 21 A1 48          LD IX, $48A1
- 88+  A078 21 A1 59             LD HL, $5881 + 288
- 89+  A07B 0E 07                LD C, 7
- 90+  A07D              FilaColumnas4:
- 91+  A07D CD D1 A0             CALL FICHA
- 92+  A080 11 04 00             LD DE, 4
- 93+  A083 DD 19                ADD IX, DE
- 94+  A085 19                   ADD HL, DE
- 95+  A086 0D                   DEC C
- 96+  A087 20 F4                JR NZ, FilaColumnas4
- 97+  A089
- 98+  A089                      ; Fila 5: $5001 / $5881+384
- 99+  A089 DD 21 01 50          LD IX, $5001
-100+  A08D 21 01 5A             LD HL, $5881 + 384
-101+  A090 0E 07                LD C, 7
-102+  A092              FilaColumnas5:
-103+  A092 CD D1 A0             CALL FICHA
-104+  A095 11 04 00             LD DE, 4
-105+  A098 DD 19                ADD IX, DE
-106+  A09A 19                   ADD HL, DE
-107+  A09B 0D                   DEC C
-108+  A09C 20 F4                JR NZ, FilaColumnas5
-109+  A09E
-110+  A09E                      ; Fila 6: $5061 / $5881+480
-111+  A09E DD 21 61 50          LD IX, $5061
-112+  A0A2 21 61 5A             LD HL, $5881 + 480
-113+  A0A5 0E 07                LD C, 7
-114+  A0A7              FilaColumnas6:
-115+  A0A7 CD D1 A0             CALL FICHA
-116+  A0AA 11 04 00             LD DE, 4
-117+  A0AD DD 19                ADD IX, DE
-118+  A0AF 19                   ADD HL, DE
-119+  A0B0 0D                   DEC C
-120+  A0B1 20 F4                JR NZ, FilaColumnas6
-121+  A0B3
-122+  A0B3 3E 06                LD A, 6
-123+  A0B5 32 9D 9B             LD (Color_Usuario), A
-124+  A0B8
-125+  A0B8 F1                   pop AF
-126+  A0B9 C1                   pop bc
-127+  A0BA D1                   pop de
-128+  A0BB DD E1                pop ix
-129+  A0BD E1                   pop hl
-130+  A0BE
-131+  A0BE C9                   RET
+  1+  9FBC              ;TABLERO_REDONDO: Dibuja el tablero de juego
+  2+  9FBC              TABLERO_REDONDO:
+  3+  9FBC E5                   PUSH    HL
+  4+  9FBD DD E5                PUSH    IX
+  5+  9FBF D5                   PUSH    DE
+  6+  9FC0 C5                   PUSH    BC
+  7+  9FC1 F5                   PUSH    AF
+  8+  9FC2
+  9+  9FC2 CD A9 9C             CALL    CLEARSCR                ; Limpiar pantalla
+ 10+  9FC5
+ 11+  9FC5 21 60 58             LD      HL, $5800 + 96          ; Posición: 3 filas abajo
+ 12+  9FC8 E5 DD E1             LD      IX, HL
+ 13+  9FCB
+ 14+  9FCB 3E 08                LD      A, 8                    ; Color azul (papel)
+ 15+  9FCD 06 13                LD      B, 19                   ; 19 filas de caracteres
+ 16+  9FCF
+ 17+  9FCF              FullCuadrao:
+ 18+  9FCF 0E 1D                LD      C, 29                   ; 29 columnas de caracteres
+ 19+  9FD1
+ 20+  9FD1              COLUMNA:
+ 21+  9FD1 77                   LD      (HL), A                 ; Pintar atributo azul
+ 22+  9FD2 23                   INC     HL
+ 23+  9FD3 0D                   DEC     C
+ 24+  9FD4 20 FB                JR      NZ, COLUMNA             ; Siguiente columna
+ 25+  9FD6
+ 26+  9FD6 11 20 00             LD      DE, 32
+ 27+  9FD9 DD 19                ADD     IX, DE                  ; Siguiente fila
+ 28+  9FDB DD E5 E1             LD      HL, IX
+ 29+  9FDE 05                   DEC     B
+ 30+  9FDF 20 EE                JR      NZ, FullCuadrao         ; Siguiente fila
+ 31+  9FE1
+ 32+  9FE1 3E 00                LD      A, 0                    ; Color negro (selector)
+ 33+  9FE3 32 9B 9B             LD      (Color_Usuario), A
+ 34+  9FE6 DD 21 21 40          LD      IX, $4021               ; Dirección pantalla fila 0
+ 35+  9FEA 21 21 58             LD      HL, $5821               ; Dirección atributos fila 0
+ 36+  9FED 0E 07                LD      C, 7                    ; 7 columnas
+ 37+  9FEF
+ 38+  9FEF              FilaColumnas0:
+ 39+  9FEF CD 9C A0             CALL    FICHA                   ; Dibujar ficha vacía
+ 40+  9FF2 11 04 00             LD      DE, 4
+ 41+  9FF5 DD 19                ADD     IX, DE                  ; Siguiente columna (pantalla)
+ 42+  9FF7 19                   ADD     HL, DE                  ; Siguiente columna (atributos)
+ 43+  9FF8 0D                   DEC     C
+ 44+  9FF9 20 F4                JR      NZ, FilaColumnas0       ; Siguiente columna
+ 45+  9FFB
+ 46+  9FFB 3E 08                LD      A, %00001000            ; Ficha negra sobre azul
+ 47+  9FFD 32 9B 9B             LD      (Color_Usuario), A
+ 48+  A000 DD 21 81 40          LD      IX, $4081               ; Dirección pantalla fila 1
+ 49+  A004 21 81 58             LD      HL, $5881               ; Dirección atributos fila 1
+ 50+  A007 0E 07                LD      C, 7                    ; 7 columnas
+ 51+  A009
+ 52+  A009              FilaColumnas1:
+ 53+  A009 CD 9C A0             CALL    FICHA                   ; Dibujar ficha vacía
+ 54+  A00C 11 04 00             LD      DE, 4
+ 55+  A00F DD 19                ADD     IX, DE                  ; Siguiente columna (pantalla)
+ 56+  A011 19                   ADD     HL, DE                  ; Siguiente columna (atributos)
+ 57+  A012 0D                   DEC     C
+ 58+  A013 20 F4                JR      NZ, FilaColumnas1       ; Siguiente columna
+ 59+  A015
+ 60+  A015 DD 21 E1 40          LD      IX, $40E1               ; Dirección pantalla fila 2
+ 61+  A019 21 E1 58             LD      HL, $5881 + 96          ; Dirección atributos fila 2
+ 62+  A01C 0E 07                LD      C, 7                    ; 7 columnas
+ 63+  A01E
+ 64+  A01E              FilaColumnas2:
+ 65+  A01E CD 9C A0             CALL    FICHA                   ; Dibujar ficha vacía
+ 66+  A021 11 04 00             LD      DE, 4
+ 67+  A024 DD 19                ADD     IX, DE                  ; Siguiente columna (pantalla)
+ 68+  A026 19                   ADD     HL, DE                  ; Siguiente columna (atributos)
+ 69+  A027 0D                   DEC     C
+ 70+  A028 20 F4                JR      NZ, FilaColumnas2       ; Siguiente columna
+ 71+  A02A
+ 72+  A02A DD 21 41 48          LD      IX, $4841               ; Dirección pantalla fila 3
+ 73+  A02E 21 41 59             LD      HL, $5881 + 192         ; Dirección atributos fila 3
+ 74+  A031 0E 07                LD      C, 7                    ; 7 columnas
+ 75+  A033
+ 76+  A033              FilaColumnas3:
+ 77+  A033 CD 9C A0             CALL    FICHA                   ; Dibujar ficha vacía
+ 78+  A036 11 04 00             LD      DE, 4
+ 79+  A039 DD 19                ADD     IX, DE                  ; Siguiente columna (pantalla)
+ 80+  A03B 19                   ADD     HL, DE                  ; Siguiente columna (atributos)
+ 81+  A03C 0D                   DEC     C
+ 82+  A03D 20 F4                JR      NZ, FilaColumnas3       ; Siguiente columna
+ 83+  A03F
+ 84+  A03F DD 21 A1 48          LD      IX, $48A1               ; Dirección pantalla fila 4
+ 85+  A043 21 A1 59             LD      HL, $5881 + 288         ; Dirección atributos fila 4
+ 86+  A046 0E 07                LD      C, 7                    ; 7 columnas
+ 87+  A048
+ 88+  A048              FilaColumnas4:
+ 89+  A048 CD 9C A0             CALL    FICHA                   ; Dibujar ficha vacía
+ 90+  A04B 11 04 00             LD      DE, 4
+ 91+  A04E DD 19                ADD     IX, DE                  ; Siguiente columna (pantalla)
+ 92+  A050 19                   ADD     HL, DE                  ; Siguiente columna (atributos)
+ 93+  A051 0D                   DEC     C
+ 94+  A052 20 F4                JR      NZ, FilaColumnas4       ; Siguiente columna
+ 95+  A054
+ 96+  A054 DD 21 01 50          LD      IX, $5001               ; Dirección pantalla fila 5
+ 97+  A058 21 01 5A             LD      HL, $5881 + 384         ; Dirección atributos fila 5
+ 98+  A05B 0E 07                LD      C, 7                    ; 7 columnas
+ 99+  A05D
+100+  A05D              FilaColumnas5:
+101+  A05D CD 9C A0             CALL    FICHA                   ; Dibujar ficha vacía
+102+  A060 11 04 00             LD      DE, 4
+103+  A063 DD 19                ADD     IX, DE                  ; Siguiente columna (pantalla)
+104+  A065 19                   ADD     HL, DE                  ; Siguiente columna (atributos)
+105+  A066 0D                   DEC     C
+106+  A067 20 F4                JR      NZ, FilaColumnas5       ; Siguiente columna
+107+  A069
+108+  A069 DD 21 61 50          LD      IX, $5061               ; Dirección pantalla fila 6
+109+  A06D 21 61 5A             LD      HL, $5881 + 480         ; Dirección atributos fila 6
+110+  A070 0E 07                LD      C, 7                    ; 7 columnas
+111+  A072
+112+  A072              FilaColumnas6:
+113+  A072 CD 9C A0             CALL    FICHA                   ; Dibujar ficha vacía
+114+  A075 11 04 00             LD      DE, 4
+115+  A078 DD 19                ADD     IX, DE                  ; Siguiente columna (pantalla)
+116+  A07A 19                   ADD     HL, DE                  ; Siguiente columna (atributos)
+117+  A07B 0D                   DEC     C
+118+  A07C 20 F4                JR      NZ, FilaColumnas6       ; Siguiente columna
+119+  A07E
+120+  A07E 3E 06                LD      A, TINTA_Yel            ; Restaurar color amarillo
+121+  A080 32 9B 9B             LD      (Color_Usuario), A
+122+  A083
+123+  A083 F1                   POP     AF
+124+  A084 C1                   POP     BC
+125+  A085 D1                   POP     DE
+126+  A086 DD E1                POP     IX
+127+  A088 E1                   POP     HL
+128+  A089 C9                   RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\TABLERO.asm
-111   A0BF                      INCLUDE "Importar_portada.asm"
+134   A08A                      INCLUDE "Importar_portada.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\Importar_portada.asm
-  1+  A0BF              IMPORT_DRAW:
-  2+  A0BF E5               PUSH HL
-  3+  A0C0 D5               PUSH DE
-  4+  A0C1 C5               PUSH BC
-  5+  A0C2 21 06 80         LD HL, portada
-  6+  A0C5 11 00 40         LD DE, $4000
-  7+  A0C8 01 00 1B         LD BC, 6912
-  8+  A0CB ED B0            LDIR
-  9+  A0CD C1               POP BC
- 10+  A0CE D1               POP DE
- 11+  A0CF E1               POP HL
- 12+  A0D0 C9               RET
+  1+  A08A              ;IMPORT_DRAW: Copia la portada a la memoria de pantalla
+  2+  A08A              IMPORT_DRAW:
+  3+  A08A E5                   PUSH    HL
+  4+  A08B D5                   PUSH    DE
+  5+  A08C C5                   PUSH    BC
+  6+  A08D
+  7+  A08D 21 06 80             LD      HL, portada             ; Origen: datos de imagen
+  8+  A090 11 00 40             LD      DE, $4000               ; Destino: memoria de video
+  9+  A093 01 00 1B             LD      BC, 6912                ; Tamaño: pantalla completa
+ 10+  A096 ED B0                LDIR                            ; Copiar bloque completo
+ 11+  A098
+ 12+  A098 C1                   POP     BC
+ 13+  A099 D1                   POP     DE
+ 14+  A09A E1                   POP     HL
+ 15+  A09B C9                   RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\Importar_portada.asm
-112   A0D1                      INCLUDE "pintaficha1.asm"
+135   A09C                      INCLUDE "pintaficha1.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\pintaficha1.asm
-  1+  A0D1              FICHA:; coje hl para pintar cuadrado y ix para la bola
-  2+  A0D1 E5                   push hl
-  3+  A0D2 D5                   push de
-  4+  A0D3 C5                   push bc
-  5+  A0D4 DD E5                push ix
-  6+  A0D6 F5                   PUSH AF
-  7+  A0D7 CD 44 A3             CALL PintaCuadrao
-  8+  A0DA DD E5 E1             ld hl, ix
-  9+  A0DD
- 10+  A0DD                      ;Detectar si estamos en la fila problemática (segunda fila)
- 11+  A0DD 7C                   LD A, H
- 12+  A0DE FE 40                CP $40
- 13+  A0E0 20 0C                JR NZ, FICHA_NORMAL
- 14+  A0E2 7D                   LD A, L
- 15+  A0E3 FE E1                CP $E1
- 16+  A0E5 38 07                JR C, FICHA_NORMAL    ; Si es menor que $E1, usar normal
- 17+  A0E7 FE FA                CP $FA
- 18+  A0E9 30 03                JR NC, FICHA_NORMAL   ; Si es mayor o igual que $FA, usar normal
- 19+  A0EB C3 17 A2             JP FICHA_ENTERCIO     ; Si está entre $E1 y $F9, usar específica
- 20+  A0EE
- 21+  A0EE              FICHA_NORMAL:
- 22+  A0EE                      ;arriba izquierda
- 23+  A0EE 3E 00                LD A,%00000000
- 24+  A0F0 77                   LD(HL),A
- 25+  A0F1 3E 01                LD A,%00000001
- 26+  A0F3 11 00 01             LD DE, $100
- 27+  A0F6 19                   ADD HL,DE
- 28+  A0F7 77                   LD(HL),A
- 29+  A0F8 3E 03                LD A,%00000011
- 30+  A0FA 11 00 01             LD DE, $100
- 31+  A0FD 19                   ADD HL,DE
- 32+  A0FE 77                   LD(HL),A
- 33+  A0FF 3E 07                LD A,%00000111
- 34+  A101 11 00 01             LD DE, $100
- 35+  A104 19                   ADD HL,DE
- 36+  A105 77                   LD(HL),A
- 37+  A106 11 00 01             LD DE, $100
- 38+  A109 19                   ADD HL,DE
- 39+  A10A 77                   LD(HL),A
- 40+  A10B 3E 0F                LD A,%00001111
- 41+  A10D 11 00 01             LD DE, $100
- 42+  A110 19                   ADD HL,DE
- 43+  A111 77                   LD(HL),A
- 44+  A112 11 00 01             LD DE, $100
- 45+  A115 19                   ADD HL,DE
- 46+  A116 77                   LD(HL),A
- 47+  A117 11 00 01             LD DE, $100
- 48+  A11A 19                   ADD HL,DE
- 49+  A11B 77                   LD(HL),A
- 50+  A11C
- 51+  A11C                      ;arriba centro
- 52+  A11C DD 23                INC IX
- 53+  A11E DD E5 E1             LD HL, IX
- 54+  A121
- 55+  A121 3E 7E                LD A,%01111110
- 56+  A123 77                   LD(HL),A
- 57+  A124 3E FF                LD A,%11111111
- 58+  A126 11 00 01             LD DE, $100
- 59+  A129 19                   ADD HL,DE
- 60+  A12A 77                   LD(HL),A
- 61+  A12B 3E FF                LD A,%11111111
- 62+  A12D 11 00 01             LD DE, $100
- 63+  A130 19                   ADD HL,DE
- 64+  A131 77                   LD(HL),A
- 65+  A132 11 00 01             LD DE, $100
- 66+  A135 19                   ADD HL,DE
- 67+  A136 77                   LD(HL),A
- 68+  A137 11 00 01             LD DE, $100
- 69+  A13A 19                   ADD HL,DE
- 70+  A13B 77                   LD(HL),A
- 71+  A13C 11 00 01             LD DE, $100
- 72+  A13F 19                   ADD HL,DE
- 73+  A140 77                   LD(HL),A
- 74+  A141 11 00 01             LD DE, $100
- 75+  A144 19                   ADD HL,DE
- 76+  A145 77                   LD(HL),A
- 77+  A146 11 00 01             LD DE, $100
- 78+  A149 19                   ADD HL,DE
- 79+  A14A 77                   LD(HL),A
- 80+  A14B
- 81+  A14B                      ;arriba derecha
- 82+  A14B
- 83+  A14B DD 23                INC IX
- 84+  A14D DD E5 E1             LD HL, IX
- 85+  A150 3E 00                LD A,%00000000
- 86+  A152 77                   LD(HL),A
- 87+  A153 3E 80                LD A,%10000000
- 88+  A155 11 00 01             LD DE, $100
- 89+  A158 19                   ADD HL,DE
- 90+  A159 77                   LD(HL),A
- 91+  A15A 3E C0                LD A,%11000000
- 92+  A15C 11 00 01             LD DE, $100
- 93+  A15F 19                   ADD HL,DE
- 94+  A160 77                   LD(HL),A
- 95+  A161 3E E0                LD A,%11100000
- 96+  A163 11 00 01             LD DE, $100
- 97+  A166 19                   ADD HL,DE
- 98+  A167 77                   LD(HL),A
- 99+  A168 11 00 01             LD DE, $100
-100+  A16B 19                   ADD HL,DE
-101+  A16C 77                   LD(HL),A
-102+  A16D 3E F0                LD A,%11110000
-103+  A16F 11 00 01             LD DE, $100
-104+  A172 19                   ADD HL,DE
-105+  A173 77                   LD(HL),A
-106+  A174 11 00 01             LD DE, $100
-107+  A177 19                   ADD HL,DE
-108+  A178 77                   LD(HL),A
-109+  A179 11 00 01             LD DE, $100
-110+  A17C 19                   ADD HL,DE
-111+  A17D 77                   LD(HL),A
-112+  A17E
-113+  A17E
-114+  A17E                      ;ld de,32
-115+  A17E                      ;add hl, de
-116+  A17E
-117+  A17E                      ;abajo derecha
-118+  A17E
-119+  A17E 01 20 00             ld bc,$20
-120+  A181 DD 09                ADD IX, BC
-121+  A183 DD E5 E1             LD HL,IX
-122+  A186 3E F0                LD A,%11110000
-123+  A188 77                   LD(HL),A
-124+  A189 11 00 01             LD DE, $100
-125+  A18C 19                   ADD HL,DE
-126+  A18D 77                   LD(HL),A
-127+  A18E 11 00 01             LD DE, $100
-128+  A191 19                   ADD HL,DE
-129+  A192 77                   LD(HL),A
-130+  A193 3E E0                LD A,%11100000
-131+  A195 11 00 01             LD DE, $100
-132+  A198 19                   ADD HL,DE
-133+  A199 77                   LD(HL),A
-134+  A19A 11 00 01             LD DE, $100
-135+  A19D 19                   ADD HL,DE
-136+  A19E 77                   LD(HL),A
-137+  A19F 3E C0                LD A,%11000000
-138+  A1A1 11 00 01             LD DE, $100
-139+  A1A4 19                   ADD HL,DE
-140+  A1A5 77                   LD(HL),A
-141+  A1A6 3E 80                LD A,%10000000
-142+  A1A8 11 00 01             LD DE, $100
-143+  A1AB 19                   ADD HL,DE
-144+  A1AC 77                   LD(HL),A
-145+  A1AD 3E 00                LD A,%00000000
-146+  A1AF 11 00 01             LD DE, $100
-147+  A1B2 19                   ADD HL,DE
-148+  A1B3 77                   LD(HL),A
-149+  A1B4
-150+  A1B4                      ;abajo centro
-151+  A1B4
-152+  A1B4 DD 2B                DEC IX
-153+  A1B6 DD E5 E1             LD HL,IX
-154+  A1B9 3E FF                LD A,%11111111
-155+  A1BB 77                   LD(HL),A
-156+  A1BC 11 00 01             LD DE, $100
-157+  A1BF 19                   ADD HL,DE
-158+  A1C0 77                   LD(HL),A
-159+  A1C1 11 00 01             LD DE, $100
-160+  A1C4 19                   ADD HL,DE
-161+  A1C5 77                   LD(HL),A
-162+  A1C6 11 00 01             LD DE, $100
-163+  A1C9 19                   ADD HL,DE
-164+  A1CA 77                   LD(HL),A
-165+  A1CB 11 00 01             LD DE, $100
-166+  A1CE 19                   ADD HL,DE
-167+  A1CF 77                   LD(HL),A
-168+  A1D0 11 00 01             LD DE, $100
-169+  A1D3 19                   ADD HL,DE
-170+  A1D4 77                   LD(HL),A
-171+  A1D5 11 00 01             LD DE, $100
-172+  A1D8 19                   ADD HL,DE
-173+  A1D9 77                   LD(HL),A
-174+  A1DA 11 00 01             LD DE, $100
-175+  A1DD 19                   ADD HL,DE
-176+  A1DE 3E 7E                LD A,%01111110
-177+  A1E0 77                   LD(HL),A
-178+  A1E1
-179+  A1E1                      ;abajo izquierda
-180+  A1E1 DD 2B                DEC IX
-181+  A1E3 DD E5 E1             LD HL,IX
-182+  A1E6 3E 0F                LD A,%00001111
-183+  A1E8 77                   LD(HL),A
-184+  A1E9 11 00 01             LD DE, $100
-185+  A1EC 19                   ADD HL,DE
-186+  A1ED 77                   LD(HL),A
-187+  A1EE 11 00 01             LD DE, $100
-188+  A1F1 19                   ADD HL,DE
-189+  A1F2 77                   LD(HL),A
-190+  A1F3 3E 07                LD A,%00000111
-191+  A1F5 11 00 01             LD DE, $100
-192+  A1F8 19                   ADD HL,DE
-193+  A1F9 77                   LD(HL),A
-194+  A1FA 11 00 01             LD DE, $100
-195+  A1FD 19                   ADD HL,DE
-196+  A1FE 77                   LD(HL),A
-197+  A1FF 3E 03                LD A,%00000011
-198+  A201 11 00 01             LD DE, $100
-199+  A204 19                   ADD HL,DE
-200+  A205 77                   LD(HL),A
-201+  A206 3E 01                LD A,%00000001
-202+  A208 11 00 01             LD DE, $100
-203+  A20B 19                   ADD HL,DE
-204+  A20C 77                   LD(HL),A
-205+  A20D 3E 00                LD A,%00000000
-206+  A20F 11 00 01             LD DE, $100
-207+  A212 19                   ADD HL,DE
-208+  A213 77                   LD(HL),A
-209+  A214 C3 3D A3             jp Fin_Ficha
-210+  A217
-211+  A217              FICHA_ENTERCIO:
-212+  A217                      ;arriba izquierda
-213+  A217 3E 00                LD A,%00000000
-214+  A219 77                   LD(HL),A
-215+  A21A 3E 01                LD A,%00000001
-216+  A21C 11 00 01             LD DE, $100
-217+  A21F 19                   ADD HL,DE
-218+  A220 77                   LD(HL),A
-219+  A221 3E 03                LD A,%00000011
-220+  A223 11 00 01             LD DE, $100
-221+  A226 19                   ADD HL,DE
-222+  A227 77                   LD(HL),A
-223+  A228 3E 07                LD A,%00000111
-224+  A22A 11 00 01             LD DE, $100
-225+  A22D 19                   ADD HL,DE
-226+  A22E 77                   LD(HL),A
-227+  A22F 11 00 01             LD DE, $100
-228+  A232 19                   ADD HL,DE
-229+  A233 77                   LD(HL),A
-230+  A234 3E 0F                LD A,%00001111
-231+  A236 11 00 01             LD DE, $100
-232+  A239 19                   ADD HL,DE
-233+  A23A 77                   LD(HL),A
-234+  A23B 11 00 01             LD DE, $100
-235+  A23E 19                   ADD HL,DE
-236+  A23F 77                   LD(HL),A
-237+  A240 11 00 01             LD DE, $100
-238+  A243 19                   ADD HL,DE
-239+  A244 77                   LD(HL),A
-240+  A245
-241+  A245                      ;arriba centro
-242+  A245 DD 23                INC IX
-243+  A247 DD E5 E1             LD HL, IX
-244+  A24A
-245+  A24A 3E 7E                LD A,%01111110
-246+  A24C 77                   LD(HL),A
-247+  A24D 3E FF                LD A,%11111111
-248+  A24F 11 00 01             LD DE, $100
-249+  A252 19                   ADD HL,DE
-250+  A253 77                   LD(HL),A
-251+  A254 3E FF                LD A,%11111111
-252+  A256 11 00 01             LD DE, $100
-253+  A259 19                   ADD HL,DE
-254+  A25A 77                   LD(HL),A
-255+  A25B 11 00 01             LD DE, $100
-256+  A25E 19                   ADD HL,DE
-257+  A25F 77                   LD(HL),A
-258+  A260 11 00 01             LD DE, $100
-259+  A263 19                   ADD HL,DE
-260+  A264 77                   LD(HL),A
-261+  A265 11 00 01             LD DE, $100
-262+  A268 19                   ADD HL,DE
-263+  A269 77                   LD(HL),A
-264+  A26A 11 00 01             LD DE, $100
-265+  A26D 19                   ADD HL,DE
-266+  A26E 77                   LD(HL),A
-267+  A26F 11 00 01             LD DE, $100
-268+  A272 19                   ADD HL,DE
-269+  A273 77                   LD(HL),A
-270+  A274
-271+  A274                      ;arriba derecha
-272+  A274
-273+  A274 DD 23                INC IX
-274+  A276 DD E5 E1             LD HL, IX
-275+  A279 3E 00                LD A,%00000000
-276+  A27B 77                   LD(HL),A
-277+  A27C 3E 80                LD A,%10000000
-278+  A27E 11 00 01             LD DE, $100
-279+  A281 19                   ADD HL,DE
-280+  A282 77                   LD(HL),A
-281+  A283 3E C0                LD A,%11000000
-282+  A285 11 00 01             LD DE, $100
-283+  A288 19                   ADD HL,DE
-284+  A289 77                   LD(HL),A
-285+  A28A 3E E0                LD A,%11100000
-286+  A28C 11 00 01             LD DE, $100
-287+  A28F 19                   ADD HL,DE
-288+  A290 77                   LD(HL),A
-289+  A291 11 00 01             LD DE, $100
-290+  A294 19                   ADD HL,DE
-291+  A295 77                   LD(HL),A
-292+  A296 3E F0                LD A,%11110000
-293+  A298 11 00 01             LD DE, $100
-294+  A29B 19                   ADD HL,DE
-295+  A29C 77                   LD(HL),A
-296+  A29D 11 00 01             LD DE, $100
-297+  A2A0 19                   ADD HL,DE
-298+  A2A1 77                   LD(HL),A
-299+  A2A2 11 00 01             LD DE, $100
-300+  A2A5 19                   ADD HL,DE
-301+  A2A6 77                   LD(HL),A
-302+  A2A7
-303+  A2A7                      ;abajo derecha en tercio
-304+  A2A7
-305+  A2A7 01 20 07             ld bc,$720
-306+  A2AA DD 09                ADD IX, BC
-307+  A2AC DD E5 E1             LD HL,IX
-308+  A2AF 3E F0                LD A,%11110000
-309+  A2B1 77                   LD(HL),A
-310+  A2B2 11 00 01             LD DE, $100
-311+  A2B5 19                   ADD HL,DE
-312+  A2B6 77                   LD(HL),A
-313+  A2B7 11 00 01             LD DE, $100
-314+  A2BA 19                   ADD HL,DE
-315+  A2BB 77                   LD(HL),A
-316+  A2BC 3E E0                LD A,%11100000
-317+  A2BE 11 00 01             LD DE, $100
-318+  A2C1 19                   ADD HL,DE
-319+  A2C2 77                   LD(HL),A
-320+  A2C3 11 00 01             LD DE, $100
-321+  A2C6 19                   ADD HL,DE
-322+  A2C7 77                   LD(HL),A
-323+  A2C8 3E C0                LD A,%11000000
-324+  A2CA 11 00 01             LD DE, $100
-325+  A2CD 19                   ADD HL,DE
-326+  A2CE 77                   LD(HL),A
-327+  A2CF 3E 80                LD A,%10000000
-328+  A2D1 11 00 01             LD DE, $100
-329+  A2D4 19                   ADD HL,DE
-330+  A2D5 77                   LD(HL),A
-331+  A2D6 3E 00                LD A,%00000000
-332+  A2D8 11 00 01             LD DE, $100
-333+  A2DB 19                   ADD HL,DE
-334+  A2DC 77                   LD(HL),A
-335+  A2DD
-336+  A2DD                      ;abajo centro
-337+  A2DD
-338+  A2DD DD 2B                DEC IX
-339+  A2DF DD E5 E1             LD HL,IX
-340+  A2E2 3E FF                LD A,%11111111
-341+  A2E4 77                   LD(HL),A
-342+  A2E5 11 00 01             LD DE, $100
-343+  A2E8 19                   ADD HL,DE
-344+  A2E9 77                   LD(HL),A
-345+  A2EA 11 00 01             LD DE, $100
-346+  A2ED 19                   ADD HL,DE
-347+  A2EE 77                   LD(HL),A
-348+  A2EF 11 00 01             LD DE, $100
-349+  A2F2 19                   ADD HL,DE
-350+  A2F3 77                   LD(HL),A
-351+  A2F4 11 00 01             LD DE, $100
-352+  A2F7 19                   ADD HL,DE
-353+  A2F8 77                   LD(HL),A
-354+  A2F9 11 00 01             LD DE, $100
-355+  A2FC 19                   ADD HL,DE
-356+  A2FD 77                   LD(HL),A
-357+  A2FE 11 00 01             LD DE, $100
-358+  A301 19                   ADD HL,DE
-359+  A302 77                   LD(HL),A
-360+  A303 11 00 01             LD DE, $100
-361+  A306 19                   ADD HL,DE
-362+  A307 3E 7E                LD A,%01111110
-363+  A309 77                   LD(HL),A
-364+  A30A
-365+  A30A                      ;abajo izquierda
-366+  A30A DD 2B                DEC IX
-367+  A30C DD E5 E1             LD HL,IX
-368+  A30F 3E 0F                LD A,%00001111
-369+  A311 77                   LD(HL),A
-370+  A312 11 00 01             LD DE, $100
-371+  A315 19                   ADD HL,DE
-372+  A316 77                   LD(HL),A
-373+  A317 11 00 01             LD DE, $100
-374+  A31A 19                   ADD HL,DE
-375+  A31B 77                   LD(HL),A
-376+  A31C 3E 07                LD A,%00000111
-377+  A31E 11 00 01             LD DE, $100
-378+  A321 19                   ADD HL,DE
-379+  A322 77                   LD(HL),A
-380+  A323 11 00 01             LD DE, $100
-381+  A326 19                   ADD HL,DE
-382+  A327 77                   LD(HL),A
-383+  A328 3E 03                LD A,%00000011
-384+  A32A 11 00 01             LD DE, $100
-385+  A32D 19                   ADD HL,DE
-386+  A32E 77                   LD(HL),A
-387+  A32F 3E 01                LD A,%00000001
-388+  A331 11 00 01             LD DE, $100
-389+  A334 19                   ADD HL,DE
-390+  A335 77                   LD(HL),A
-391+  A336 3E 00                LD A,%00000000
-392+  A338 11 00 01             LD DE, $100
-393+  A33B 19                   ADD HL,DE
-394+  A33C 77                   LD(HL),A
-395+  A33D              Fin_Ficha:
-396+  A33D F1                   POP AF
-397+  A33E DD E1                pop ix
-398+  A340 C1                   pop bc
-399+  A341 D1                   pop de
-400+  A342 E1                   pop hl
-401+  A343 C9                   RET
-402+  A344
-403+  A344              PintaCuadrao:;coge hl externo
-404+  A344
-405+  A344 3A 9D 9B             LD A, (Color_Usuario)
-406+  A347 18 02                JR SEGUIR
-407+  A349              BORRAR_FICHA:
-408+  A349 3E 00                LD A,0
-409+  A34B              SEGUIR:
-410+  A34B C5                   PUSH BC
-411+  A34C E5                   PUSH HL
-412+  A34D F5                   PUSH AF
-413+  A34E
-414+  A34E
-415+  A34E 77                   LD (HL), A
-416+  A34F 23                   INC HL
-417+  A350 77                   LD (HL), A
-418+  A351 23                   INC HL
-419+  A352 77                   LD (HL), A
-420+  A353 11 20 00             LD DE,32
-421+  A356 19                   ADD HL,DE
-422+  A357 77                   LD (HL), A
-423+  A358 2B                   DEC HL
-424+  A359 77                   LD (HL),A
-425+  A35A 2B                   DEC HL
-426+  A35B 77                   LD (HL), A
-427+  A35C
-428+  A35C F1                   POP AF
-429+  A35D E1                   POP HL
-430+  A35E C1                   POP BC
-431+  A35F C9                   RET
-432+  A360
-433+  A360              ; Variables para guardar posicion final de la ficha (usadas por Comprobar4enraya)
-434+  A360 00           ColumnaFinal: db 0              ; Columna donde cayo la ficha (0-6)
-435+  A361 00           FilaFinal:    db 0              ; Fila donde cayo la ficha (0-5)
-436+  A362
-437+  A362              Animacion_Caeficha:
-438+  A362
-439+  A362 AF                   xor a
-440+  A363 32 9B 9B             ld (ColumnaFull), a
-441+  A366
-442+  A366                      ; GUARDAMOS LA COLUMNA para usarla despues en Comprobar4enraya
-443+  A366 7D                   ld a, l                ; A columna (0-6)
-444+  A367 32 60 A3             ld (ColumnaFinal), a   ; Guardar columna para despues
-445+  A36A
-446+  A36A DD 21 C8 9B          ld ix, Posiciones1     ; IX = inicio del tablero
-447+  A36E 3C                   inc a                  ; +1 por el $ff
-448+  A36F 5F                   ld e, a
-449+  A370 16 00                ld d, 0
-450+  A372 DD 19                add ix, de             ; IX = Posiciones1 +1 + columna
-451+  A374
-452+  A374 11 2D 00             ld de, 9*5             ; 45 bytes, ultima fila
-453+  A377 DD 19                add ix, de             ; IX apunta a ultima fila
-454+  A379
-455+  A379 06 06                ld b, 6                ; 6 filas (5..0)
-456+  A37B 11 F7 FF             ld de, -9              ; salto hacia arriba una fila
-457+  A37E
-458+  A37E              BuscarHueco:
-459+  A37E DD 7E 00             ld a, (ix)
-460+  A381 FE 00                cp 0
-461+  A383 28 06                jr z, HuecoEncontrado
-462+  A385
-463+  A385 DD 19                add ix, de             ; subir 1 fila
-464+  A387 10 F5                djnz BuscarHueco
-465+  A389
-466+  A389 18 47                jr ColumnaLlena
-467+  A38B
-468+  A38B              HuecoEncontrado:
-469+  A38B
-470+  A38B                      ; Guardamos color
-471+  A38B 3A 9D 9B             ld a, (Color_Usuario)
-472+  A38E DD 77 00             ld (ix), a
-473+  A391
-474+  A391                      ; CALCULAMOS Y GUARDAMOS LA FILA FINAL
-475+  A391                      ; B=6 -> fila 5, B=5 -> fila 4, ..., B=1 -> fila 0
-476+  A391                      ; Fila = B - 1
-477+  A391 78                   ld a, b
-478+  A392 3D                   dec a
-479+  A393 32 61 A3             ld (FilaFinal), a      ; Guardar fila para Comprobar4enraya
-480+  A396
-481+  A396                      ; B vale filas probadas
-482+  A396 48                   ld c, b                ; C = veces que cae
-483+  A397 26 00                ld h, 0                ; empezar caida desde encima del tablero
-484+  A399
-485+  A399              bucle_Cae:
-486+  A399 24                   inc H
-487+  A39A CD D8 A3             call PintaCuadrao1
-488+  A39D CD 13 A4             call ESPERAR
-489+  A3A0 0D                   dec c
-490+  A3A1 28 05                jr z, TerminaAnimacion
-491+  A3A3 CD E8 A3             call BORRAR_FICHA1
-492+  A3A6 18 F1                jr bucle_Cae
-493+  A3A8              TerminaAnimacion:
-494+  A3A8 AF                   xor a
-495+  A3A9 32 9B 9B             ld (ColumnaFull), a
-496+  A3AC
-497+  A3AC                      ; Incrementar contador de fichas
-498+  A3AC 3A 99 9B             ld a, (ContadorFichas)
-499+  A3AF 3C                   inc a
-500+  A3B0 32 99 9B             ld (ContadorFichas), a
-501+  A3B3
-502+  A3B3                      ; Cargar fila y columna guardadas para Comprobar4enraya
-503+  A3B3                      ; H = fila (0-5), L = columna (0-6)
-504+  A3B3 E5                   push hl                ; Guardar HL actual
-505+  A3B4 3A 61 A3             ld a, (FilaFinal)
-506+  A3B7 67                   ld h, a
-507+  A3B8 3A 60 A3             ld a, (ColumnaFinal)
-508+  A3BB 6F                   ld l, a
-509+  A3BC CD C1 A5             call Comprobar4enraya
-510+  A3BF E1                   pop hl                 ; Restaurar HL
-511+  A3C0
-512+  A3C0                      ; Si hay 4 en raya, ya termino (Caracter='F')
-513+  A3C0 3A 9C 9B             ld a, (Caracter)
-514+  A3C3 FE 46                cp 'F'
-515+  A3C5 C8                   ret z
-516+  A3C6
-517+  A3C6                      ; Comprobar si tablero lleno (42 fichas = 6 filas x 7 columnas)
-518+  A3C6 3A 99 9B             ld a, (ContadorFichas)
-519+  A3C9 FE 2A                cp 42
-520+  A3CB C0                   ret nz                 ; Si no esta lleno, seguir jugando
-521+  A3CC
-522+  A3CC                      ; Tablero lleno = tablas
-523+  A3CC 3E 46                ld a, 'F'
-524+  A3CE 32 9C 9B             ld (Caracter), a       ; Terminar juego
-525+  A3D1 C9                   ret
-526+  A3D2              ColumnaLlena:
-527+  A3D2 3E 01                ld a, 1
-528+  A3D4 32 9B 9B             ld (ColumnaFull),a
-529+  A3D7 C9                   ret
-530+  A3D8              PintaCuadrao1:;coge hl externo, DE 0-6 EN H (FILA) Y L (COLUMNA) CALCULA COORD Y PINTA
-531+  A3D8
-532+  A3D8 7C                   LD A, H
-533+  A3D9 B7                   OR A
-534+  A3DA 28 07                JR Z, COLOR_SUPERIOR
-535+  A3DC 3A 9D 9B             LD A, (Color_Usuario)
-536+  A3DF F6 08                OR PAPEL_Azul
-537+  A3E1 18 0E                JR SEGUIR1
-538+  A3E3              COLOR_SUPERIOR:
-539+  A3E3 3A 9D 9B             LD A, (Color_Usuario)
-540+  A3E6 18 09                JR SEGUIR1
-541+  A3E8              BORRAR_FICHA1:
-542+  A3E8 7C                   LD A, H ;compruebo si es arriba del tablero(h=0)
-543+  A3E9 B7                   OR A
-544+  A3EA 28 04                JR Z, BORRAR_SUPERIOR
-545+  A3EC 3E 08                LD A, PAPEL_Azul + TINTA_Blck
-546+  A3EE 18 01                JR SEGUIR1
-547+  A3F0              BORRAR_SUPERIOR:
-548+  A3F0 AF                   XOR A
-549+  A3F1              SEGUIR1:
-550+  A3F1 E5                   PUSH HL
-551+  A3F2 F5                   PUSH AF
-552+  A3F3 F5                   PUSH AF
-553+  A3F4 7C                   LD A, H  ; H= H*3 +1 "abajo"
-554+  A3F5 84                   ADD A, H
-554+  A3F6 84            ADD A, H
-555+  A3F7 3C                   INC A
-556+  A3F8 67                   LD H,A
-557+  A3F9 7D                   LD A,L ; L = L*4 +1 "derecha"
-558+  A3FA 85                   ADD A,L
-559+  A3FB 87                   ADD A,A
-560+  A3FC 3C                   INC A
-561+  A3FD 6F                   LD L,A
-562+  A3FE CD 8A A6             CALL SlotPointer ;HL>$5800
-563+  A401 F1                   POP AF
-564+  A402 77                   LD (HL), A
-565+  A403 23                   INC HL
-566+  A404 77                   LD (HL), A
-567+  A405 23                   INC HL
-568+  A406 77                   LD (HL), A
-569+  A407 11 20 00             LD DE,32
-570+  A40A 19                   ADD HL,DE
-571+  A40B 77                   LD (HL), A
-572+  A40C 2B                   DEC HL
-573+  A40D 77                   LD (HL),A
-574+  A40E 2B                   DEC HL
-575+  A40F 77                   LD (HL), A
-576+  A410
-577+  A410 F1                   POP AF
-578+  A411 E1                   POP HL
-579+  A412 C9                   RET
-580+  A413              ESPERAR:
-581+  A413 C5                   push bc
-582+  A414 06 32                LD B,50
-583+  A416 0E FF        D1:     LD C, 255
-584+  A418 0D           D2:     DEC C
-585+  A419 20 FD                JR NZ,D2
-586+  A41B 10 F9                DJNZ D1
-587+  A41D C1                   pop bc
-588+  A41E C9                   RET
-589+  A41F
-590+  A41F
+  1+  A09C              ; pintaficha1: Dibuja fichas y animación del tablero.
+  2+  A09C
+  3+  A09C              ; FICHA: Dibuja una ficha circular (3x2).
+  4+  A09C              FICHA:
+  5+  A09C E5                   PUSH    HL
+  6+  A09D D5                   PUSH    DE
+  7+  A09E C5                   PUSH    BC
+  8+  A09F DD E5                PUSH    IX
+  9+  A0A1 F5                   PUSH    AF
+ 10+  A0A2
+ 11+  A0A2 CD 3B A2             CALL    PintaCuadrao            ; Pintar fondo del cuadrado
+ 12+  A0A5 DD E5 E1             LD      HL, IX                  ; HL = dirección de pantalla
+ 13+  A0A8
+ 14+  A0A8 7C                   LD      A, H                    ; Detectar fila problemática
+ 15+  A0A9 FE 40                CP      $40                     ; ¿Segundo tercio?
+ 16+  A0AB 20 0F                JR      NZ, FICHA_NORMAL        ; No, usar normal
+ 17+  A0AD 7D                   LD      A, L
+ 18+  A0AE FE E1                CP      $E1                     ; ¿Está entre $E1 y $F9?
+ 19+  A0B0 38 0A                JR      C, FICHA_NORMAL         ; No, usar normal
+ 20+  A0B2 FE FA                CP      $FA
+ 21+  A0B4 30 06                JR      NC, FICHA_NORMAL        ; No, usar normal
+ 22+  A0B6 CD 7B A1             CALL    FICHA_ENTERCIO_DRAW     ; Sí, usar especial
+ 23+  A0B9 C3 34 A2             JP      Fin_Ficha
+ 24+  A0BC
+ 25+  A0BC              FICHA_NORMAL:
+ 26+  A0BC CD C2 A0             CALL    FICHA_NORMAL_DRAW       ; Dibujar ficha normal
+ 27+  A0BF C3 34 A2             JP      Fin_Ficha
+ 28+  A0C2
+ 29+  A0C2              ; FICHA_NORMAL_DRAW: Dibuja ficha en modo normal.
+ 30+  A0C2              FICHA_NORMAL_DRAW:
+ 31+  A0C2                      ; Arriba izquierda
+ 32+  A0C2 3E 00                LD      A, %00000000
+ 33+  A0C4 77                   LD      (HL), A                 ; Línea 0
+ 34+  A0C5 11 00 01             LD      DE, $100
+ 35+  A0C8 19                   ADD     HL, DE
+ 36+  A0C9 3E 01                LD      A, %00000001
+ 37+  A0CB 77                   LD      (HL), A                 ; Línea 1
+ 38+  A0CC 19                   ADD     HL, DE
+ 39+  A0CD 3E 03                LD      A, %00000011
+ 40+  A0CF 77                   LD      (HL), A                 ; Línea 2
+ 41+  A0D0 19                   ADD     HL, DE
+ 42+  A0D1 3E 07                LD      A, %00000111
+ 43+  A0D3 77                   LD      (HL), A                 ; Línea 3
+ 44+  A0D4 19                   ADD     HL, DE
+ 45+  A0D5 77                   LD      (HL), A                 ; Línea 4
+ 46+  A0D6 19                   ADD     HL, DE
+ 47+  A0D7 3E 0F                LD      A, %00001111
+ 48+  A0D9 77                   LD      (HL), A                 ; Línea 5
+ 49+  A0DA 19                   ADD     HL, DE
+ 50+  A0DB 77                   LD      (HL), A                 ; Línea 6
+ 51+  A0DC 19                   ADD     HL, DE
+ 52+  A0DD 77                   LD      (HL), A                 ; Línea 7
+ 53+  A0DE
+ 54+  A0DE                      ; Arriba centro
+ 55+  A0DE DD 23                INC     IX
+ 56+  A0E0 DD E5 E1             LD      HL, IX
+ 57+  A0E3 3E 7E                LD      A, %01111110
+ 58+  A0E5 77                   LD      (HL), A                 ; Línea 0
+ 59+  A0E6 11 00 01             LD      DE, $100
+ 60+  A0E9 19                   ADD     HL, DE
+ 61+  A0EA 3E FF                LD      A, %11111111
+ 62+  A0EC 77                   LD      (HL), A                 ; Línea 1
+ 63+  A0ED 19                   ADD     HL, DE
+ 64+  A0EE 77                   LD      (HL), A                 ; Línea 2
+ 65+  A0EF 19                   ADD     HL, DE
+ 66+  A0F0 77                   LD      (HL), A                 ; Línea 3
+ 67+  A0F1 19                   ADD     HL, DE
+ 68+  A0F2 77                   LD      (HL), A                 ; Línea 4
+ 69+  A0F3 19                   ADD     HL, DE
+ 70+  A0F4 77                   LD      (HL), A                 ; Línea 5
+ 71+  A0F5 19                   ADD     HL, DE
+ 72+  A0F6 77                   LD      (HL), A                 ; Línea 6
+ 73+  A0F7 19                   ADD     HL, DE
+ 74+  A0F8 77                   LD      (HL), A                 ; Línea 7
+ 75+  A0F9
+ 76+  A0F9                      ; Arriba derecha
+ 77+  A0F9 DD 23                INC     IX
+ 78+  A0FB DD E5 E1             LD      HL, IX
+ 79+  A0FE 3E 00                LD      A, %00000000
+ 80+  A100 77                   LD      (HL), A                 ; Línea 0
+ 81+  A101 11 00 01             LD      DE, $100
+ 82+  A104 19                   ADD     HL, DE
+ 83+  A105 3E 80                LD      A, %10000000
+ 84+  A107 77                   LD      (HL), A                 ; Línea 1
+ 85+  A108 19                   ADD     HL, DE
+ 86+  A109 3E C0                LD      A, %11000000
+ 87+  A10B 77                   LD      (HL), A                 ; Línea 2
+ 88+  A10C 19                   ADD     HL, DE
+ 89+  A10D 3E E0                LD      A, %11100000
+ 90+  A10F 77                   LD      (HL), A                 ; Línea 3
+ 91+  A110 19                   ADD     HL, DE
+ 92+  A111 77                   LD      (HL), A                 ; Línea 4
+ 93+  A112 19                   ADD     HL, DE
+ 94+  A113 3E F0                LD      A, %11110000
+ 95+  A115 77                   LD      (HL), A                 ; Línea 5
+ 96+  A116 19                   ADD     HL, DE
+ 97+  A117 77                   LD      (HL), A                 ; Línea 6
+ 98+  A118 19                   ADD     HL, DE
+ 99+  A119 77                   LD      (HL), A                 ; Línea 7
+100+  A11A
+101+  A11A                      ; Abajo derecha
+102+  A11A 01 20 00             LD      BC, $20
+103+  A11D DD 09                ADD     IX, BC                  ; Siguiente carácter
+104+  A11F DD E5 E1             LD      HL, IX
+105+  A122 3E F0                LD      A, %11110000
+106+  A124 77                   LD      (HL), A                 ; Línea 0
+107+  A125 11 00 01             LD      DE, $100
+108+  A128 19                   ADD     HL, DE
+109+  A129 77                   LD      (HL), A                 ; Línea 1
+110+  A12A 19                   ADD     HL, DE
+111+  A12B 77                   LD      (HL), A                 ; Línea 2
+112+  A12C 19                   ADD     HL, DE
+113+  A12D 3E E0                LD      A, %11100000
+114+  A12F 77                   LD      (HL), A                 ; Línea 3
+115+  A130 19                   ADD     HL, DE
+116+  A131 77                   LD      (HL), A                 ; Línea 4
+117+  A132 19                   ADD     HL, DE
+118+  A133 3E C0                LD      A, %11000000
+119+  A135 77                   LD      (HL), A                 ; Línea 5
+120+  A136 19                   ADD     HL, DE
+121+  A137 3E 80                LD      A, %10000000
+122+  A139 77                   LD      (HL), A                 ; Línea 6
+123+  A13A 19                   ADD     HL, DE
+124+  A13B 3E 00                LD      A, %00000000
+125+  A13D 77                   LD      (HL), A                 ; Línea 7
+126+  A13E
+127+  A13E                      ; Abajo centro
+128+  A13E DD 2B                DEC     IX
+129+  A140 DD E5 E1             LD      HL, IX
+130+  A143 3E FF                LD      A, %11111111
+131+  A145 77                   LD      (HL), A                 ; Línea 0
+132+  A146 11 00 01             LD      DE, $100
+133+  A149 19                   ADD     HL, DE
+134+  A14A 77                   LD      (HL), A                 ; Línea 1
+135+  A14B 19                   ADD     HL, DE
+136+  A14C 77                   LD      (HL), A                 ; Línea 2
+137+  A14D 19                   ADD     HL, DE
+138+  A14E 77                   LD      (HL), A                 ; Línea 3
+139+  A14F 19                   ADD     HL, DE
+140+  A150 77                   LD      (HL), A                 ; Línea 4
+141+  A151 19                   ADD     HL, DE
+142+  A152 77                   LD      (HL), A                 ; Línea 5
+143+  A153 19                   ADD     HL, DE
+144+  A154 77                   LD      (HL), A                 ; Línea 6
+145+  A155 19                   ADD     HL, DE
+146+  A156 3E 7E                LD      A, %01111110
+147+  A158 77                   LD      (HL), A                 ; Línea 7
+148+  A159
+149+  A159                      ; Abajo izquierda
+150+  A159 DD 2B                DEC     IX
+151+  A15B DD E5 E1             LD      HL, IX
+152+  A15E 3E 0F                LD      A, %00001111
+153+  A160 77                   LD      (HL), A                 ; Línea 0
+154+  A161 11 00 01             LD      DE, $100
+155+  A164 19                   ADD     HL, DE
+156+  A165 77                   LD      (HL), A                 ; Línea 1
+157+  A166 19                   ADD     HL, DE
+158+  A167 77                   LD      (HL), A                 ; Línea 2
+159+  A168 19                   ADD     HL, DE
+160+  A169 3E 07                LD      A, %00000111
+161+  A16B 77                   LD      (HL), A                 ; Línea 3
+162+  A16C 19                   ADD     HL, DE
+163+  A16D 77                   LD      (HL), A                 ; Línea 4
+164+  A16E 19                   ADD     HL, DE
+165+  A16F 3E 03                LD      A, %00000011
+166+  A171 77                   LD      (HL), A                 ; Línea 5
+167+  A172 19                   ADD     HL, DE
+168+  A173 3E 01                LD      A, %00000001
+169+  A175 77                   LD      (HL), A                 ; Línea 6
+170+  A176 19                   ADD     HL, DE
+171+  A177 3E 00                LD      A, %00000000
+172+  A179 77                   LD      (HL), A                 ; Línea 7
+173+  A17A C9                   RET
+174+  A17B
+175+  A17B              ; FICHA_ENTERCIO_DRAW: Dibuja ficha cruzando tercio.
+176+  A17B              FICHA_ENTERCIO_DRAW:
+177+  A17B                      ; Arriba izquierda
+178+  A17B 3E 00                LD      A, %00000000
+179+  A17D 77                   LD      (HL), A                 ; Línea 0
+180+  A17E 11 00 01             LD      DE, $100
+181+  A181 19                   ADD     HL, DE
+182+  A182 3E 01                LD      A, %00000001
+183+  A184 77                   LD      (HL), A                 ; Línea 1
+184+  A185 19                   ADD     HL, DE
+185+  A186 3E 03                LD      A, %00000011
+186+  A188 77                   LD      (HL), A                 ; Línea 2
+187+  A189 19                   ADD     HL, DE
+188+  A18A 3E 07                LD      A, %00000111
+189+  A18C 77                   LD      (HL), A                 ; Línea 3
+190+  A18D 19                   ADD     HL, DE
+191+  A18E 77                   LD      (HL), A                 ; Línea 4
+192+  A18F 19                   ADD     HL, DE
+193+  A190 3E 0F                LD      A, %00001111
+194+  A192 77                   LD      (HL), A                 ; Línea 5
+195+  A193 19                   ADD     HL, DE
+196+  A194 77                   LD      (HL), A                 ; Línea 6
+197+  A195 19                   ADD     HL, DE
+198+  A196 77                   LD      (HL), A                 ; Línea 7
+199+  A197
+200+  A197                      ; Arriba centro
+201+  A197 DD 23                INC     IX
+202+  A199 DD E5 E1             LD      HL, IX
+203+  A19C 3E 7E                LD      A, %01111110
+204+  A19E 77                   LD      (HL), A                 ; Línea 0
+205+  A19F 11 00 01             LD      DE, $100
+206+  A1A2 19                   ADD     HL, DE
+207+  A1A3 3E FF                LD      A, %11111111
+208+  A1A5 77                   LD      (HL), A                 ; Línea 1
+209+  A1A6 19                   ADD     HL, DE
+210+  A1A7 77                   LD      (HL), A                 ; Línea 2
+211+  A1A8 19                   ADD     HL, DE
+212+  A1A9 77                   LD      (HL), A                 ; Línea 3
+213+  A1AA 19                   ADD     HL, DE
+214+  A1AB 77                   LD      (HL), A                 ; Línea 4
+215+  A1AC 19                   ADD     HL, DE
+216+  A1AD 77                   LD      (HL), A                 ; Línea 5
+217+  A1AE 19                   ADD     HL, DE
+218+  A1AF 77                   LD      (HL), A                 ; Línea 6
+219+  A1B0 19                   ADD     HL, DE
+220+  A1B1 77                   LD      (HL), A                 ; Línea 7
+221+  A1B2
+222+  A1B2                      ; Arriba derecha
+223+  A1B2 DD 23                INC     IX
+224+  A1B4 DD E5 E1             LD      HL, IX
+225+  A1B7 3E 00                LD      A, %00000000
+226+  A1B9 77                   LD      (HL), A                 ; Línea 0
+227+  A1BA 11 00 01             LD      DE, $100
+228+  A1BD 19                   ADD     HL, DE
+229+  A1BE 3E 80                LD      A, %10000000
+230+  A1C0 77                   LD      (HL), A                 ; Línea 1
+231+  A1C1 19                   ADD     HL, DE
+232+  A1C2 3E C0                LD      A, %11000000
+233+  A1C4 77                   LD      (HL), A                 ; Línea 2
+234+  A1C5 19                   ADD     HL, DE
+235+  A1C6 3E E0                LD      A, %11100000
+236+  A1C8 77                   LD      (HL), A                 ; Línea 3
+237+  A1C9 19                   ADD     HL, DE
+238+  A1CA 77                   LD      (HL), A                 ; Línea 4
+239+  A1CB 19                   ADD     HL, DE
+240+  A1CC 3E F0                LD      A, %11110000
+241+  A1CE 77                   LD      (HL), A                 ; Línea 5
+242+  A1CF 19                   ADD     HL, DE
+243+  A1D0 77                   LD      (HL), A                 ; Línea 6
+244+  A1D1 19                   ADD     HL, DE
+245+  A1D2 77                   LD      (HL), A                 ; Línea 7
+246+  A1D3
+247+  A1D3                      ; Abajo derecha (offset especial $720)
+248+  A1D3 01 20 07             LD      BC, $720
+249+  A1D6 DD 09                ADD     IX, BC                  ; Salto especial para tercio
+250+  A1D8 DD E5 E1             LD      HL, IX
+251+  A1DB 3E F0                LD      A, %11110000
+252+  A1DD 77                   LD      (HL), A                 ; Línea 0
+253+  A1DE 11 00 01             LD      DE, $100
+254+  A1E1 19                   ADD     HL, DE
+255+  A1E2 77                   LD      (HL), A                 ; Línea 1
+256+  A1E3 19                   ADD     HL, DE
+257+  A1E4 77                   LD      (HL), A                 ; Línea 2
+258+  A1E5 19                   ADD     HL, DE
+259+  A1E6 3E E0                LD      A, %11100000
+260+  A1E8 77                   LD      (HL), A                 ; Línea 3
+261+  A1E9 19                   ADD     HL, DE
+262+  A1EA 77                   LD      (HL), A                 ; Línea 4
+263+  A1EB 19                   ADD     HL, DE
+264+  A1EC 3E C0                LD      A, %11000000
+265+  A1EE 77                   LD      (HL), A                 ; Línea 5
+266+  A1EF 19                   ADD     HL, DE
+267+  A1F0 3E 80                LD      A, %10000000
+268+  A1F2 77                   LD      (HL), A                 ; Línea 6
+269+  A1F3 19                   ADD     HL, DE
+270+  A1F4 3E 00                LD      A, %00000000
+271+  A1F6 77                   LD      (HL), A                 ; Línea 7
+272+  A1F7
+273+  A1F7                      ; Abajo centro
+274+  A1F7 DD 2B                DEC     IX
+275+  A1F9 DD E5 E1             LD      HL, IX
+276+  A1FC 3E FF                LD      A, %11111111
+277+  A1FE 77                   LD      (HL), A                 ; Línea 0
+278+  A1FF 11 00 01             LD      DE, $100
+279+  A202 19                   ADD     HL, DE
+280+  A203 77                   LD      (HL), A                 ; Línea 1
+281+  A204 19                   ADD     HL, DE
+282+  A205 77                   LD      (HL), A                 ; Línea 2
+283+  A206 19                   ADD     HL, DE
+284+  A207 77                   LD      (HL), A                 ; Línea 3
+285+  A208 19                   ADD     HL, DE
+286+  A209 77                   LD      (HL), A                 ; Línea 4
+287+  A20A 19                   ADD     HL, DE
+288+  A20B 77                   LD      (HL), A                 ; Línea 5
+289+  A20C 19                   ADD     HL, DE
+290+  A20D 77                   LD      (HL), A                 ; Línea 6
+291+  A20E 19                   ADD     HL, DE
+292+  A20F 3E 7E                LD      A, %01111110
+293+  A211 77                   LD      (HL), A                 ; Línea 7
+294+  A212
+295+  A212                      ; Abajo izquierda
+296+  A212 DD 2B                DEC     IX
+297+  A214 DD E5 E1             LD      HL, IX
+298+  A217 3E 0F                LD      A, %00001111
+299+  A219 77                   LD      (HL), A                 ; Línea 0
+300+  A21A 11 00 01             LD      DE, $100
+301+  A21D 19                   ADD     HL, DE
+302+  A21E 77                   LD      (HL), A                 ; Línea 1
+303+  A21F 19                   ADD     HL, DE
+304+  A220 77                   LD      (HL), A                 ; Línea 2
+305+  A221 19                   ADD     HL, DE
+306+  A222 3E 07                LD      A, %00000111
+307+  A224 77                   LD      (HL), A                 ; Línea 3
+308+  A225 19                   ADD     HL, DE
+309+  A226 77                   LD      (HL), A                 ; Línea 4
+310+  A227 19                   ADD     HL, DE
+311+  A228 3E 03                LD      A, %00000011
+312+  A22A 77                   LD      (HL), A                 ; Línea 5
+313+  A22B 19                   ADD     HL, DE
+314+  A22C 3E 01                LD      A, %00000001
+315+  A22E 77                   LD      (HL), A                 ; Línea 6
+316+  A22F 19                   ADD     HL, DE
+317+  A230 3E 00                LD      A, %00000000
+318+  A232 77                   LD      (HL), A                 ; Línea 7
+319+  A233 C9                   RET
+320+  A234
+321+  A234              ; Fin_Ficha: Salida de FICHA y restauración de registros.
+322+  A234              Fin_Ficha:
+323+  A234 F1                   POP     AF
+324+  A235 DD E1                POP     IX
+325+  A237 C1                   POP     BC
+326+  A238 D1                   POP     DE
+327+  A239 E1                   POP     HL
+328+  A23A C9                   RET
+329+  A23B
+330+  A23B              ; PintaCuadrao: Pinta cuadrado 3x2 con color del usuario.
+331+  A23B              PintaCuadrao:
+332+  A23B 3A 9B 9B             LD      A, (Color_Usuario)
+333+  A23E 18 02                JR      SEGUIR
+334+  A240
+335+  A240              ; BORRAR_FICHA: Borra cuadrado 3x2 (atributo 0).
+336+  A240              BORRAR_FICHA:
+337+  A240 3E 00                LD      A, 0
+338+  A242
+339+  A242              SEGUIR:
+340+  A242 C5                   PUSH    BC
+341+  A243 E5                   PUSH    HL
+342+  A244 F5                   PUSH    AF
+343+  A245 D5                   PUSH    DE
+344+  A246
+345+  A246 77                   LD      (HL), A                 ; Byte 0 fila 1
+346+  A247 23                   INC     HL
+347+  A248 77                   LD      (HL), A                 ; Byte 1 fila 1
+348+  A249 23                   INC     HL
+349+  A24A 77                   LD      (HL), A                 ; Byte 2 fila 1
+350+  A24B
+351+  A24B 11 20 00             LD      DE, 32                  ; Siguiente fila de atributos
+352+  A24E 19                   ADD     HL, DE
+353+  A24F 77                   LD      (HL), A                 ; Byte 2 fila 2
+354+  A250 2B                   DEC     HL
+355+  A251 77                   LD      (HL), A                 ; Byte 1 fila 2
+356+  A252 2B                   DEC     HL
+357+  A253 77                   LD      (HL), A                 ; Byte 0 fila 2
+358+  A254
+359+  A254 D1                   POP     DE
+360+  A255 F1                   POP     AF
+361+  A256 E1                   POP     HL
+362+  A257 C1                   POP     BC
+363+  A258 C9                   RET
+364+  A259
+365+  A259              ; Datos: Variables de posición de ficha.
+366+  A259 00           ColumnaFinal:   DB 0                    ; Columna donde cayo la ficha (0-6)
+367+  A25A 00           FilaFinal:      DB 0                    ; Fila donde cayo la ficha (0-5)
+368+  A25B
+369+  A25B              ; Animacion_Caeficha: Anima caída y actualiza estado del juego.
+370+  A25B              Animacion_Caeficha:
+371+  A25B F5                   PUSH    AF
+372+  A25C C5                   PUSH    BC
+373+  A25D D5                   PUSH    DE
+374+  A25E DD E5                PUSH    IX
+375+  A260
+376+  A260 AF                   XOR     A                       ; Limpiar flag columna llena
+377+  A261 32 99 9B             LD      (ColumnaFull), A
+378+  A264
+379+  A264 7D                   LD      A, L                    ; Guardar columna
+380+  A265 32 59 A2             LD      (ColumnaFinal), A
+381+  A268
+382+  A268 DD 21 9C 9B          LD      IX, Posiciones1         ; Base del array
+383+  A26C 3C                   INC     A                       ; +1 por borde $FF
+384+  A26D 5F                   LD      E, A
+385+  A26E 16 00                LD      D, 0
+386+  A270 DD 19                ADD     IX, DE                  ; IX apunta a la columna
+387+  A272
+388+  A272 11 2D 00             LD      DE, 9*5                 ; Ir a última fila
+389+  A275 DD 19                ADD     IX, DE
+390+  A277
+391+  A277 06 06                LD      B, 6                    ; 6 filas a comprobar
+392+  A279 11 F7 FF             LD      DE, -9                  ; Salto hacia arriba
+393+  A27C
+394+  A27C              BuscarHueco:
+395+  A27C DD 7E 00             LD      A, (IX)
+396+  A27F FE 00                CP      0                       ; ¿Hueco vacío?
+397+  A281 28 06                JR      Z, HuecoEncontrado      ; Sí, usar este
+398+  A283
+399+  A283 DD 19                ADD     IX, DE                  ; Subir 1 fila
+400+  A285 10 F5                DJNZ    BuscarHueco             ; Repetir
+401+  A287
+402+  A287 18 4E                JR      ColumnaLlena            ; No hay hueco
+403+  A289
+404+  A289              HuecoEncontrado:
+405+  A289 3A 9B 9B             LD      A, (Color_Usuario)      ; Guardar color en array
+406+  A28C DD 77 00             LD      (IX), A
+407+  A28F
+408+  A28F 78                   LD      A, B                    ; Calcular fila final
+409+  A290 3D                   DEC     A                       ; B=6 -> fila 5, etc.
+410+  A291 32 5A A2             LD      (FilaFinal), A
+411+  A294 48                   LD      C, B                    ; C = pasos de animación
+412+  A295 26 00                LD      H, 0                    ; Empezar desde fila 0
+413+  A297
+414+  A297              bucle_Cae:
+415+  A297 24                   INC     H                       ; Siguiente fila
+416+  A298 CD E2 A2             CALL    PintaCuadrao1           ; Dibujar ficha
+417+  A29B CD 21 A3             CALL    ESPERAR                 ; Retardo
+418+  A29E 0D                   DEC     C                       ; Decrementar pasos
+419+  A29F 28 05                JR      Z, TerminaAnimacion     ; Si C=0, terminar
+420+  A2A1 CD F2 A2             CALL    BORRAR_FICHA1           ; Borrar ficha anterior
+421+  A2A4 18 F1                JR      bucle_Cae               ; Repetir
+422+  A2A6
+423+  A2A6              TerminaAnimacion:
+424+  A2A6 AF                   XOR     A
+425+  A2A7 32 99 9B             LD      (ColumnaFull), A        ; Limpiar flag
+426+  A2AA
+427+  A2AA 3A 97 9B             LD      A, (ContadorFichas)     ; Incrementar contador
+428+  A2AD 3C                   INC     A
+429+  A2AE 32 97 9B             LD      (ContadorFichas), A
+430+  A2B1
+431+  A2B1 E5                   PUSH    HL                      ; Guardar HL
+432+  A2B2 3A 5A A2             LD      A, (FilaFinal)
+433+  A2B5 67                   LD      H, A
+434+  A2B6 3A 59 A2             LD      A, (ColumnaFinal)
+435+  A2B9 6F                   LD      L, A
+436+  A2BA CD F8 A4             CALL    Comprobar4enraya        ; Comprobar victoria
+437+  A2BD E1                   POP     HL                      ; Restaurar HL
+438+  A2BE
+439+  A2BE 3A 9A 9B             LD      A, (Caracter)
+440+  A2C1 FE 46                CP      'F'                     ; ¿Hay 4 en raya?
+441+  A2C3 28 0C                JR      Z, Animacion_Fin        ; Sí, salir
+442+  A2C5
+443+  A2C5 3A 97 9B             LD      A, (ContadorFichas)
+444+  A2C8 FE 2A                CP      42                      ; ¿Tablero lleno?
+445+  A2CA 20 05                JR      NZ, Animacion_Fin       ; No, salir normal
+446+  A2CC
+447+  A2CC 3E 46                LD      A, 'F'                  ; Sí, marcar fin (tablas)
+448+  A2CE 32 9A 9B             LD      (Caracter), A
+449+  A2D1
+450+  A2D1              Animacion_Fin:
+451+  A2D1 DD E1                POP     IX
+452+  A2D3 D1                   POP     DE
+453+  A2D4 C1                   POP     BC
+454+  A2D5 F1                   POP     AF
+455+  A2D6 C9                   RET
+456+  A2D7
+457+  A2D7              ; ColumnaLlena: Marca columna llena.
+458+  A2D7              ColumnaLlena:
+459+  A2D7 3E 01                LD      A, 1                    ; Marcar columna llena
+460+  A2D9 32 99 9B             LD      (ColumnaFull), A
+461+  A2DC DD E1                POP     IX
+462+  A2DE D1                   POP     DE
+463+  A2DF C1                   POP     BC
+464+  A2E0 F1                   POP     AF
+465+  A2E1 C9                   RET
+466+  A2E2
+467+  A2E2              ; PintaCuadrao1: Pinta 3x2 en coordenadas del tablero.
+468+  A2E2              PintaCuadrao1:
+469+  A2E2 7C                   LD      A, H
+470+  A2E3 B7                   OR      A                       ; ¿Fila 0?
+471+  A2E4 28 07                JR      Z, COLOR_SUPERIOR       ; Sí, sin fondo azul
+472+  A2E6 3A 9B 9B             LD      A, (Color_Usuario)
+473+  A2E9 F6 08                OR      PAPEL_Azul              ; Añadir fondo azul
+474+  A2EB 18 0E                JR      SEGUIR1
+475+  A2ED
+476+  A2ED              COLOR_SUPERIOR:
+477+  A2ED 3A 9B 9B             LD      A, (Color_Usuario)      ; Solo color, sin fondo
+478+  A2F0 18 09                JR      SEGUIR1
+479+  A2F2
+480+  A2F2              ; BORRAR_FICHA1: Borra 3x2 en coordenadas del tablero.
+481+  A2F2              BORRAR_FICHA1:
+482+  A2F2 7C                   LD      A, H
+483+  A2F3 B7                   OR      A                       ; ¿Fila 0?
+484+  A2F4 28 04                JR      Z, BORRAR_SUPERIOR      ; Sí, atributo 0
+485+  A2F6 3E 08                LD      A, PAPEL_Azul + TINTA_Blck
+486+  A2F8 18 01                JR      SEGUIR1
+487+  A2FA
+488+  A2FA              BORRAR_SUPERIOR:
+489+  A2FA AF                   XOR     A                       ; Atributo 0
+490+  A2FB
+491+  A2FB              SEGUIR1:
+492+  A2FB E5                   PUSH    HL
+493+  A2FC D5                   PUSH    DE
+494+  A2FD C5                   PUSH    BC
+495+  A2FE F5                   PUSH    AF                      ; Guardar atributo
+496+  A2FF
+497+  A2FF                      ; Convertir coordenadas logicas a posicion de atributos
+498+  A2FF                      ; H = H*3 + 1 (fila de caracteres)
+499+  A2FF 47                   LD      B, A                    ; Guardar atributo en B
+500+  A300 7C                   LD      A, H
+501+  A301 84                   ADD     A, H
+502+  A302 84                   ADD     A, H
+503+  A303 3C                   INC     A
+504+  A304 67                   LD      H, A
+505+  A305
+506+  A305                      ; L = L*4 + 1 (columna de caracteres)
+507+  A305 7D                   LD      A, L
+508+  A306 85                   ADD     A, L
+509+  A307 87                   ADD     A, A
+510+  A308 3C                   INC     A
+511+  A309 6F                   LD      L, A
+512+  A30A
+513+  A30A CD C3 A5             CALL    SlotPointer             ; HL = direccion de atributos
+514+  A30D
+515+  A30D                      ; Pintar cuadrado 3x2
+516+  A30D 78                   LD      A, B                    ; Recuperar atributo
+517+  A30E 77                   LD      (HL), A
+518+  A30F 23                   INC     HL
+519+  A310 77                   LD      (HL), A
+520+  A311 23                   INC     HL
+521+  A312 77                   LD      (HL), A
+522+  A313 11 20 00             LD      DE, 32
+523+  A316 19                   ADD     HL, DE
+524+  A317 77                   LD      (HL), A
+525+  A318 2B                   DEC     HL
+526+  A319 77                   LD      (HL), A
+527+  A31A 2B                   DEC     HL
+528+  A31B 77                   LD      (HL), A
+529+  A31C
+530+  A31C F1                   POP     AF
+531+  A31D C1                   POP     BC
+532+  A31E D1                   POP     DE
+533+  A31F E1                   POP     HL
+534+  A320 C9                   RET
+535+  A321
+536+  A321              ; ESPERAR: Retardo para animación de fichas.
+537+  A321              ESPERAR:
+538+  A321 C5                   PUSH    BC
+539+  A322 06 32                LD      B, 50
+540+  A324              D1:
+541+  A324 0E FF                LD      C, 255
+542+  A326              D2:
+543+  A326 0D                   DEC     C
+544+  A327 20 FD                JR      NZ, D2
+545+  A329 10 F9                DJNZ    D1
+546+  A32B C1                   POP     BC
+547+  A32C C9                   RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\pintaficha1.asm
-113   A41F                      INCLUDE "telasNuevas.asm"
+136   A32D                      INCLUDE "telasNuevas.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\telasNuevas.asm
-  1+  A41F              ;funciones al leer una tecla válida(excepto F que hace que salga):
-  2+  A41F              MOVER_DERECHA:
-  3+  A41F CD E8 A3         CALL BORRAR_FICHA1
-  4+  A422 2C               INC L
-  5+  A423 7D               LD A, L
-  6+  A424 FE 06            CP POS_MAX1
-  7+  A426 28 04            JR Z, DIBUJA_DCHA
-  8+  A428 38 02            JR C, DIBUJA_DCHA
-  9+  A42A              SALTO_FINAL:
- 10+  A42A 2E 00            LD L, 0
- 11+  A42C              DIBUJA_DCHA:
- 12+  A42C CD D8 A3         CALL PintaCuadrao1
- 13+  A42F C9               RET
- 14+  A430
- 15+  A430
- 16+  A430              MOVER_IZQUIERDA:
- 17+  A430 CD E8 A3         CALL BORRAR_FICHA1
- 18+  A433 7D               LD A, L
- 19+  A434 FE 00            CP POS_MIN1
- 20+  A436 28 07            JR Z, SALTO_INICIO
- 21+  A438 38 05            JR C, SALTO_INICIO
- 22+  A43A 2D               DEC L
- 23+  A43B CD D8 A3         CALL PintaCuadrao1
- 24+  A43E C9               RET
- 25+  A43F              SALTO_INICIO:
- 26+  A43F 2E 06            LD L, POS_MAX1
- 27+  A441 CD D8 A3         CALL PintaCuadrao1
- 28+  A444 C9               RET
- 29+  A445
- 30+  A445              ;función principal---------------------------------
- 31+  A445              ES_AMARILLOYNolocambio:
- 32+  A445 CD D8 A3         CALL PintaCuadrao1
- 33+  A448              TECLAS: ; CAMBIA A
- 34+  A448 C5               PUSH BC
- 35+  A449
- 36+  A449              L15:
- 37+  A449 01 FE FB         LD BC,$FBFE
- 38+  A44C ED 78            IN A,(C)
- 39+  A44E CB 47            BIT 0,A
- 40+  A450 20 0D            JR NZ,L16
- 41+  A452 CD B7 A6         CALL SOLTAR_TECLA
- 42+  A455 3E 51            LD A,'Q'
- 43+  A457 32 9C 9B         LD (Caracter),A
- 44+  A45A C1               POP BC
- 45+  A45B CD 30 A4         CALL MOVER_IZQUIERDA
- 46+  A45E C9               RET
- 47+  A45F              L16:
- 48+  A45F CB 4F            BIT 1,A
- 49+  A461 20 0D            JR NZ,L17
- 50+  A463 CD B7 A6         CALL SOLTAR_TECLA
- 51+  A466 3E 57            LD A,'W'
- 52+  A468 32 9C 9B         LD (Caracter),A
- 53+  A46B C1               POP BC
- 54+  A46C CD 1F A4         CALL MOVER_DERECHA
- 55+  A46F C9               RET
- 56+  A470
- 57+  A470
- 58+  A470              L17:
- 59+  A470 01 FE FD         LD BC,$FDFE
- 60+  A473 ED 78            IN A,(C)
- 61+  A475 CB 5F            BIT 3,A
- 62+  A477 20 0A            JR NZ,L5
- 63+  A479 CD B7 A6         CALL SOLTAR_TECLA
- 64+  A47C 3E 46            LD A,'F'
- 65+  A47E 32 9C 9B         LD (Caracter),A
- 66+  A481 C1               POP BC
- 67+  A482 C9               RET
- 68+  A483              L5:                     ; Este cambia porque es RETURN y se carga como carácter $FF
- 69+  A483 01 FE BF         LD BC,$BFFE
- 70+  A486 ED 78            IN A,(C)
- 71+  A488 CB 47            BIT 0,A
- 72+  A48A 20 BD            JR NZ,L15
- 73+  A48C CD B7 A6         CALL SOLTAR_TECLA
- 74+  A48F 3E FF            LD A,$FF
- 75+  A491 32 9C 9B         LD (Caracter),A
- 76+  A494 C1               POP BC
- 77+  A495 18 1D            jr CAMBIAR_USUARIO
- 78+  A497
- 79+  A497
- 80+  A497              ;cambio de usuario y lectura de movimiento con o-p
- 81+  A497              ES_ROJO:
- 82+  A497 CD A3 A5         CALL Tablero_lleno
- 83+  A49A 3A 98 9B         ld a, (FullTablero)
- 84+  A49D FE 01            cp 1
- 85+  A49F 28 0D            jr z, seAcaba
- 86+  A4A1 3E 06            LD A, TINTA_Yel          ; cambiar a amarillo (sin papel)
- 87+  A4A3 32 9D 9B         LD (Color_Usuario), A
- 88+  A4A6 26 00            LD H,0    ; Restaurar posición inicial
- 89+  A4A8 2E 00            LD L,0
- 90+  A4AA CD D8 A3         CALL PintaCuadrao1
- 91+  A4AD C9               RET
- 92+  A4AE              seAcaba:
- 93+  A4AE 3E 46            ld a, "F"
- 94+  A4B0 32 9C 9B         ld(Caracter), A
- 95+  A4B3 C9               ret
- 96+  A4B4
- 97+  A4B4              CAMBIAR_USUARIO:
- 98+  A4B4 CD E8 A3         CALL BORRAR_FICHA1
- 99+  A4B7 CD 62 A3         CALL Animacion_Caeficha
-100+  A4BA
-101+  A4BA                  ; Comprobar si hay 4 en raya (Caracter = 'F') y salir inmediatamente
-102+  A4BA 3A 9C 9B         ld a, (Caracter)
-103+  A4BD FE 46            cp 'F'
-104+  A4BF C8               ret z                  ; Si hay 4 en raya, salir sin cambiar usuario
-105+  A4C0
-106+  A4C0 3A 9B 9B         ld a,(ColumnaFull);comprobamos si la columna ha estado llena
-107+  A4C3 FE 01            cp 1
-108+  A4C5 CA 30 A5         jp z, nohaycambio
-109+  A4C8 3A 9D 9B         LD A, (Color_Usuario)   ; carga el color actual
-110+  A4CB FE 06            CP TINTA_Yel            ; comparo con amarillo
-111+  A4CD 20 C8            JR NZ, ES_ROJO          ; si es amarillo se cambia a rojo
-112+  A4CF 3E 02            LD A, TINTA_Red         ; cambiar a rojo (sin papel)
-113+  A4D1 32 9D 9B         LD (Color_Usuario), A
-114+  A4D4 26 00            LD H,0
-115+  A4D6 2E 00            ld L,0    ; Restaurar posición inicial
-116+  A4D8              ES_ROJOYNolocambio:
-117+  A4D8 CD D8 A3         CALL PintaCuadrao1
-118+  A4DB              L21:
-119+  A4DB C5               PUSH BC                 ; Guardar BC al inicio del bucle
-120+  A4DC 01 FE DF         LD BC,$DFFE
-121+  A4DF ED 78            IN A,(C)
-122+  A4E1 CB 47            BIT 0,A
-123+  A4E3 20 0E            JR NZ,L22
-124+  A4E5 CD B7 A6         CALL SOLTAR_TECLA
-125+  A4E8 3E 50            LD A,'P'
-126+  A4EA 32 9C 9B         LD (Caracter),A
-127+  A4ED C1               POP BC
-128+  A4EE CD 1F A4         CALL MOVER_DERECHA
-129+  A4F1 18 E8            jr L21
-130+  A4F3              L22:
-131+  A4F3 CB 4F            BIT 1,A
-132+  A4F5 20 0E            JR NZ,L23
-133+  A4F7 CD B7 A6         CALL SOLTAR_TECLA
-134+  A4FA 3E 4F            LD A,'O'
-135+  A4FC 32 9C 9B         LD (Caracter),A
-136+  A4FF C1               POP BC
-137+  A500 CD 30 A4         CALL MOVER_IZQUIERDA
-138+  A503 18 D6            jr L21
-139+  A505              L23:
-140+  A505 01 FE FD         LD BC,$FDFE
-141+  A508 ED 78            IN A,(C)
-142+  A50A CB 5F            BIT 3,A
-143+  A50C 20 0A            JR NZ,L24
-144+  A50E CD B7 A6         CALL SOLTAR_TECLA
-145+  A511 3E 46            LD A,'F'
-146+  A513 32 9C 9B         LD (Caracter),A
-147+  A516 C1               POP BC
-148+  A517 C9               RET
-149+  A518              L24:                     ; Este cambia porque es RETURN y se carga como carácter $FF
-150+  A518 01 FE BF         LD BC,$BFFE
-151+  A51B ED 78            IN A,(C)
-152+  A51D CB 47            BIT 0,A
-153+  A51F 20 0B            JR NZ,L25
-154+  A521 CD B7 A6         CALL SOLTAR_TECLA
-155+  A524 3E FF            LD A,$FF
-156+  A526 32 9C 9B         LD (Caracter),A
-157+  A529 C1               POP BC
-158+  A52A 18 88            jr CAMBIAR_USUARIO
-159+  A52C              L25:
-160+  A52C C1               POP BC              ; Limpiar stack si no se presionó ninguna tecla
-161+  A52D 18 AC            jr L21
-162+  A52F
-163+  A52F C9               RET
-164+  A530              nohaycambio:
-165+  A530 AF               xor a
-166+  A531 32 9B 9B         ld (ColumnaFull), a
-167+  A534 3A 9D 9B         LD A, (Color_Usuario)   ; carga el color actual
-168+  A537 FE 06            CP TINTA_Yel            ; comparo con amarillo
-169+  A539 C2 D8 A4         JP NZ, ES_ROJOYNolocambio
-170+  A53C C3 45 A4         JP ES_AMARILLOYNolocambio
+  1+  A32D              ;MOVER_DERECHA: Mueve el cursor a la derecha
+  2+  A32D              MOVER_DERECHA:
+  3+  A32D C5                   PUSH    BC
+  4+  A32E D5                   PUSH    DE
+  5+  A32F
+  6+  A32F CD F2 A2             CALL    BORRAR_FICHA1           ; Borrar ficha actual
+  7+  A332 2C                   INC     L                       ; Siguiente columna
+  8+  A333 7D                   LD      A, L
+  9+  A334 FE 06                CP      POS_MAX1                ; ¿Llegó al máximo?
+ 10+  A336 28 04                JR      Z, DIBUJA_DCHA          ; Sí, dibujar ahí
+ 11+  A338 38 02                JR      C, DIBUJA_DCHA          ; Aún no, dibujar
+ 12+  A33A
+ 13+  A33A              SALTO_FINAL:
+ 14+  A33A 2E 00                LD      L, 0                    ; Wrap-around a columna 0
+ 15+  A33C
+ 16+  A33C              DIBUJA_DCHA:
+ 17+  A33C CD E2 A2             CALL    PintaCuadrao1           ; Dibujar en nueva posición
+ 18+  A33F
+ 19+  A33F D1                   POP     DE
+ 20+  A340 C1                   POP     BC
+ 21+  A341 C9                   RET
+ 22+  A342
+ 23+  A342              ;MOVER_IZQUIERDA: Mueve el cursor a la izquierda
+ 24+  A342              MOVER_IZQUIERDA:
+ 25+  A342 C5                   PUSH    BC
+ 26+  A343 D5                   PUSH    DE
+ 27+  A344
+ 28+  A344 CD F2 A2             CALL    BORRAR_FICHA1           ; Borrar ficha actual
+ 29+  A347 7D                   LD      A, L
+ 30+  A348 FE 00                CP      POS_MIN1                ; ¿Está en el mínimo?
+ 31+  A34A 28 09                JR      Z, SALTO_INICIO         ; Sí, wrap
+ 32+  A34C 38 07                JR      C, SALTO_INICIO
+ 33+  A34E 2D                   DEC     L                       ; Columna anterior
+ 34+  A34F CD E2 A2             CALL    PintaCuadrao1           ; Dibujar en nueva posición
+ 35+  A352
+ 36+  A352 D1                   POP     DE
+ 37+  A353 C1                   POP     BC
+ 38+  A354 C9                   RET
+ 39+  A355
+ 40+  A355              SALTO_INICIO:
+ 41+  A355 2E 06                LD      L, POS_MAX1             ; Wrap-around a columna máxima
+ 42+  A357 CD E2 A2             CALL    PintaCuadrao1           ; Dibujar en nueva posición
+ 43+  A35A
+ 44+  A35A D1                   POP     DE
+ 45+  A35B C1                   POP     BC
+ 46+  A35C C9                   RET
+ 47+  A35D
+ 48+  A35D              ;ES_AMARILLOYNolocambio: Redibuja el cursor del jugador amarillo
+ 49+  A35D              ES_AMARILLOYNolocambio:
+ 50+  A35D CD E2 A2             CALL    PintaCuadrao1           ; Redibujar cursor
+ 51+  A360
+ 52+  A360              ;TECLAS: Lee teclas del jugador amarillo
+ 53+  A360              TECLAS:
+ 54+  A360 C5                   PUSH    BC
+ 55+  A361
+ 56+  A361              L15:
+ 57+  A361 01 FE FB             LD      BC, $FBFE
+ 58+  A364 ED 78                IN      A, (C)                  ; Leer puerto $FBFE
+ 59+  A366 CB 47                BIT     0, A                    ; Comprobar tecla Q
+ 60+  A368 20 0D                JR      NZ, L16                 ; No pulsada, siguiente
+ 61+  A36A CD F4 A5             CALL    SOLTAR_TECLA
+ 62+  A36D 3E 51                LD      A, 'Q'
+ 63+  A36F 32 9A 9B             LD      (Caracter), A
+ 64+  A372 C1                   POP     BC
+ 65+  A373 CD 42 A3             CALL    MOVER_IZQUIERDA         ; Mover a la izquierda
+ 66+  A376 C9                   RET
+ 67+  A377
+ 68+  A377              L16:
+ 69+  A377 CB 4F                BIT     1, A                    ; Comprobar tecla W
+ 70+  A379 20 0D                JR      NZ, L17                 ; No pulsada, siguiente
+ 71+  A37B CD F4 A5             CALL    SOLTAR_TECLA
+ 72+  A37E 3E 57                LD      A, 'W'
+ 73+  A380 32 9A 9B             LD      (Caracter), A
+ 74+  A383 C1                   POP     BC
+ 75+  A384 CD 2D A3             CALL    MOVER_DERECHA           ; Mover a la derecha
+ 76+  A387 C9                   RET
+ 77+  A388
+ 78+  A388              L17:
+ 79+  A388 01 FE FD             LD      BC, $FDFE
+ 80+  A38B ED 78                IN      A, (C)                  ; Leer puerto $FDFE
+ 81+  A38D CB 5F                BIT     3, A                    ; Comprobar tecla F
+ 82+  A38F 20 0A                JR      NZ, L5                  ; No pulsada, siguiente
+ 83+  A391 CD F4 A5             CALL    SOLTAR_TECLA
+ 84+  A394 3E 46                LD      A, 'F'
+ 85+  A396 32 9A 9B             LD      (Caracter), A
+ 86+  A399 C1                   POP     BC
+ 87+  A39A C9                   RET                             ; Finalizar
+ 88+  A39B
+ 89+  A39B              L5:
+ 90+  A39B 01 FE BF             LD      BC, $BFFE
+ 91+  A39E ED 78                IN      A, (C)                  ; Leer puerto $BFFE
+ 92+  A3A0 CB 47                BIT     0, A                    ; Comprobar ENTER
+ 93+  A3A2 20 BD                JR      NZ, L15                 ; No pulsada, seguir
+ 94+  A3A4 CD F4 A5             CALL    SOLTAR_TECLA
+ 95+  A3A7 3E FF                LD      A, $FF                  ; Código especial ENTER
+ 96+  A3A9 32 9A 9B             LD      (Caracter), A
+ 97+  A3AC C1                   POP     BC
+ 98+  A3AD C3 CD A3             JP      CAMBIAR_USUARIO
+ 99+  A3B0
+100+  A3B0              ;ES_ROJO: Prepara el turno del otro jugador
+101+  A3B0              ES_ROJO:
+102+  A3B0 CD DA A4             CALL    Tablero_lleno           ; Comprobar si está lleno
+103+  A3B3 3A 96 9B             LD      A, (FullTablero)
+104+  A3B6 FE 01                CP      1                       ; ¿Tablero lleno?
+105+  A3B8 28 0D                JR      Z, seAcaba              ; Sí, terminar
+106+  A3BA
+107+  A3BA 3E 06                LD      A, TINTA_Yel            ; Cambiar a amarillo
+108+  A3BC 32 9B 9B             LD      (Color_Usuario), A
+109+  A3BF 26 00                LD      H, 0                    ; Posición inicial
+110+  A3C1 2E 00                LD      L, 0
+111+  A3C3 CD E2 A2             CALL    PintaCuadrao1           ; Dibujar cursor
+112+  A3C6 C9                   RET
+113+  A3C7
+114+  A3C7              seAcaba:
+115+  A3C7 3E 46                LD      A, 'F'                  ; Marcar fin
+116+  A3C9 32 9A 9B             LD      (Caracter), A
+117+  A3CC C9                   RET
+118+  A3CD
+119+  A3CD              ;CAMBIAR_USUARIO: Procesa la jugada y cambia de jugador
+120+  A3CD              CAMBIAR_USUARIO:
+121+  A3CD C5                   PUSH    BC
+122+  A3CE D5                   PUSH    DE
+123+  A3CF
+124+  A3CF CD F2 A2             CALL    BORRAR_FICHA1           ; Borrar cursor
+125+  A3D2 CD 5B A2             CALL    Animacion_Caeficha      ; Soltar ficha
+126+  A3D5
+127+  A3D5 3A 9A 9B             LD      A, (Caracter)
+128+  A3D8 FE 46                CP      'F'                     ; ¿Hay 4 en raya?
+129+  A3DA 28 78                JR      Z, CAMBIAR_FIN          ; Sí, salir
+130+  A3DC
+131+  A3DC 3A 99 9B             LD      A, (ColumnaFull)
+132+  A3DF FE 01                CP      1                       ; ¿Columna llena?
+133+  A3E1 CA 57 A4             JP      Z, nohaycambio          ; Sí, repetir turno
+134+  A3E4
+135+  A3E4 3A 9B 9B             LD      A, (Color_Usuario)
+136+  A3E7 FE 06                CP      TINTA_Yel               ; ¿Es amarillo?
+137+  A3E9 20 64                JR      NZ, ES_ROJO_CAMBIO      ; No, cambiar a amarillo
+138+  A3EB
+139+  A3EB 3E 02                LD      A, TINTA_Red            ; Cambiar a rojo
+140+  A3ED 32 9B 9B             LD      (Color_Usuario), A
+141+  A3F0 26 00                LD      H, 0                    ; Posición inicial
+142+  A3F2 2E 00                LD      L, 0
+143+  A3F4
+144+  A3F4              ES_ROJOYNolocambio:
+145+  A3F4 CD E2 A2             CALL    PintaCuadrao1           ; Redibujar cursor rojo
+146+  A3F7
+147+  A3F7              L21:
+148+  A3F7 C5                   PUSH    BC
+149+  A3F8 01 FE DF             LD      BC, $DFFE
+150+  A3FB ED 78                IN      A, (C)                  ; Leer puerto $DFFE
+151+  A3FD
+152+  A3FD CB 47                BIT     0, A                    ; Comprobar tecla P (derecha)
+153+  A3FF 20 0E                JR      NZ, L22                 ; No pulsada, siguiente
+154+  A401 CD F4 A5             CALL    SOLTAR_TECLA
+155+  A404 3E 50                LD      A, 'P'
+156+  A406 32 9A 9B             LD      (Caracter), A
+157+  A409 C1                   POP     BC
+158+  A40A CD 2D A3             CALL    MOVER_DERECHA           ; Mover a la derecha
+159+  A40D 18 E8                JR      L21                     ; Volver a leer
+160+  A40F
+161+  A40F              L22:
+162+  A40F CB 4F                BIT     1, A                    ; Comprobar tecla O (izquierda)
+163+  A411 20 0E                JR      NZ, L23                 ; No pulsada, siguiente
+164+  A413 CD F4 A5             CALL    SOLTAR_TECLA
+165+  A416 3E 4F                LD      A, 'O'
+166+  A418 32 9A 9B             LD      (Caracter), A
+167+  A41B C1                   POP     BC
+168+  A41C CD 42 A3             CALL    MOVER_IZQUIERDA         ; Mover a la izquierda
+169+  A41F 18 D6                JR      L21                     ; Volver a leer
+170+  A421
+171+  A421              L23:
+172+  A421 01 FE FD             LD      BC, $FDFE
+173+  A424 ED 78                IN      A, (C)                  ; Leer puerto $FDFE
+174+  A426 CB 5F                BIT     3, A                    ; Comprobar tecla F
+175+  A428 20 0B                JR      NZ, L24                 ; No pulsada, siguiente
+176+  A42A CD F4 A5             CALL    SOLTAR_TECLA
+177+  A42D 3E 46                LD      A, 'F'
+178+  A42F 32 9A 9B             LD      (Caracter), A
+179+  A432 C1                   POP     BC
+180+  A433 18 1F                JR      CAMBIAR_FIN             ; Finalizar
+181+  A435
+182+  A435              L24:
+183+  A435 01 FE BF             LD      BC, $BFFE
+184+  A438 ED 78                IN      A, (C)                  ; Leer puerto $BFFE
+185+  A43A CB 47                BIT     0, A                    ; Comprobar ENTER
+186+  A43C 20 0E                JR      NZ, L25                 ; No pulsada, seguir
+187+  A43E CD F4 A5             CALL    SOLTAR_TECLA
+188+  A441 3E FF                LD      A, $FF                  ; Código especial ENTER
+189+  A443 32 9A 9B             LD      (Caracter), A
+190+  A446 C1                   POP     BC
+191+  A447 D1                   POP     DE
+192+  A448 C1                   POP     BC
+193+  A449 C3 CD A3             JP      CAMBIAR_USUARIO         ; Procesar soltar ficha
+194+  A44C
+195+  A44C              L25:
+196+  A44C C1                   POP     BC                      ; Ninguna tecla
+197+  A44D 18 A8                JR      L21                     ; Seguir leyendo
+198+  A44F
+199+  A44F              ;ES_ROJO_CAMBIO: Salta a preparación del otro jugador
+200+  A44F              ES_ROJO_CAMBIO:
+201+  A44F D1                   POP     DE
+202+  A450 C1                   POP     BC
+203+  A451 C3 B0 A3             JP      ES_ROJO                 ; Preparar turno rojo
+204+  A454
+205+  A454              ;CAMBIAR_FIN: Finaliza secuencia de cambio
+206+  A454              CAMBIAR_FIN:
+207+  A454 D1                   POP     DE
+208+  A455 C1                   POP     BC
+209+  A456 C9                   RET
+210+  A457
+211+  A457              ;nohaycambio: Repite turno si la columna estaba llena
+212+  A457              nohaycambio:
+213+  A457 AF                   XOR     A                       ; Limpiar flag de columna llena
+214+  A458 32 99 9B             LD      (ColumnaFull), A
+215+  A45B 3A 9B 9B             LD      A, (Color_Usuario)
+216+  A45E FE 06                CP      TINTA_Yel               ; ¿Es amarillo?
+217+  A460 C2 F4 A3             JP      NZ, ES_ROJOYNolocambio  ; No, es rojo
+218+  A463 D1                   POP     DE
+219+  A464 C1                   POP     BC
+220+  A465 C3 5D A3             JP      ES_AMARILLOYNolocambio  ; Sí, es amarillo
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\telasNuevas.asm
-114   A53F                      INCLUDE "juego1.asm"
+137   A468                      INCLUDE "juego1.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\juego1.asm
-  1+  A53F              JUEGO:
-  2+  A53F                  ; REINICIAR VARIABLES AL INICIO DE CADA PARTIDA
-  3+  A53F AF               XOR A
-  4+  A540 32 98 9B         LD (FullTablero), A    ; Reiniciar flag de tablero lleno
-  5+  A543 32 9B 9B         LD (ColumnaFull), A    ; Reiniciar flag de columna llena
-  6+  A546 32 99 9B         LD (ContadorFichas), A ; Reiniciar contador de fichas
-  7+  A549 32 9A 9B         LD (Ganador), A        ; Reiniciar ganador (0 = tablas)
-  8+  A54C
-  9+  A54C                  ; LIMPIAR TABLERO Posiciones1 (6 filas x 9 bytes)
- 10+  A54C CD 69 A5         CALL LimpiarTablero
- 11+  A54F
- 12+  A54F CD E8 9F         CALL TABLERO_REDONDO
- 13+  A552
- 14+  A552                  ; Reiniciar color del usuario a amarillo DESPUES de TABLERO_REDONDO
- 15+  A552                  ; (TABLERO_REDONDO modifica Color_Usuario internamente)
- 16+  A552 3E 06            LD A, TINTA_Yel
- 17+  A554 32 9D 9B         LD (Color_Usuario), A
- 18+  A557
- 19+  A557 26 00            LD H, 0
- 20+  A559 2E 00            LD L, 0
- 21+  A55B CD D8 A3         CALL PintaCuadrao1
- 22+  A55E              JUEGOEMPEZADO:
- 23+  A55E CD 48 A4         CALL TECLAS
- 24+  A561 3A 9C 9B         LD A,(Caracter)
- 25+  A564 FE 46            CP 'F'
- 26+  A566 20 F6            jr nz, JUEGOEMPEZADO
- 27+  A568 C9               RET
- 28+  A569
- 29+  A569              ; RUTINA: Limpia el tablero Posiciones1 poniendo 0 en las casillas y $FF en los bordes
- 30+  A569              LimpiarTablero:
- 31+  A569 F5               PUSH AF
- 32+  A56A C5               PUSH BC
- 33+  A56B DD E5            PUSH IX
- 34+  A56D
- 35+  A56D DD 21 C8 9B      LD IX, Posiciones1
- 36+  A571 06 06            LD B, 6                ; 6 filas
- 37+  A573              LimpiarFila:
- 38+  A573 DD 36 00 FF      LD (IX), $FF           ; Borde izquierdo
- 39+  A577 DD 36 01 00      LD (IX+1), 0           ; Columnas 0-6 a 0 (vacio)
- 40+  A57B DD 36 02 00      LD (IX+2), 0
- 41+  A57F DD 36 03 00      LD (IX+3), 0
- 42+  A583 DD 36 04 00      LD (IX+4), 0
- 43+  A587 DD 36 05 00      LD (IX+5), 0
- 44+  A58B DD 36 06 00      LD (IX+6), 0
- 45+  A58F DD 36 07 00      LD (IX+7), 0
- 46+  A593 DD 36 08 FF      LD (IX+8), $FF         ; Borde derecho
- 47+  A597 11 09 00         LD DE, 9
- 48+  A59A DD 19            ADD IX, DE             ; Siguiente fila
- 49+  A59C 10 D5            DJNZ LimpiarFila
- 50+  A59E
- 51+  A59E DD E1            POP IX
- 52+  A5A0 C1               POP BC
- 53+  A5A1 F1               POP AF
- 54+  A5A2 C9               RET
+  1+  A468              ; juego1: Lógica principal del juego.
+  2+  A468
+  3+  A468              ; JUEGO: Punto de entrada principal de una partida.
+  4+  A468              JUEGO:
+  5+  A468 F5                   PUSH    AF
+  6+  A469 C5                   PUSH    BC
+  7+  A46A D5                   PUSH    DE
+  8+  A46B E5                   PUSH    HL
+  9+  A46C DD E5                PUSH    IX
+ 10+  A46E
+ 11+  A46E AF                   XOR     A                       ; Reiniciar variables
+ 12+  A46F 32 96 9B             LD      (FullTablero), A        ; Tablero no lleno
+ 13+  A472 32 99 9B             LD      (ColumnaFull), A        ; Columna no llena
+ 14+  A475 32 97 9B             LD      (ContadorFichas), A     ; 0 fichas colocadas
+ 15+  A478 32 98 9B             LD      (Ganador), A            ; No hay ganador aún
+ 16+  A47B
+ 17+  A47B CD 9E A4             CALL    LimpiarTablero          ; Limpiar array Posiciones1
+ 18+  A47E
+ 19+  A47E CD BC 9F             CALL    TABLERO_REDONDO         ; Dibujar tablero gráfico
+ 20+  A481
+ 21+  A481 3E 06                LD      A, TINTA_Yel            ; Color inicial: amarillo
+ 22+  A483 32 9B 9B             LD      (Color_Usuario), A
+ 23+  A486
+ 24+  A486 26 00                LD      H, 0                    ; Fila 0 (encima del tablero)
+ 25+  A488 2E 00                LD      L, 0                    ; Columna 0
+ 26+  A48A CD E2 A2             CALL    PintaCuadrao1           ; Dibujar cursor inicial
+ 27+  A48D
+ 28+  A48D              JUEGOEMPEZADO:
+ 29+  A48D CD 60 A3             CALL    TECLAS                  ; Leer teclas del jugador
+ 30+  A490 3A 9A 9B             LD      A, (Caracter)
+ 31+  A493 FE 46                CP      'F'                     ; ¿Fin del juego?
+ 32+  A495 20 F6                JR      NZ, JUEGOEMPEZADO       ; No, seguir jugando
+ 33+  A497
+ 34+  A497 DD E1                POP     IX
+ 35+  A499 E1                   POP     HL
+ 36+  A49A D1                   POP     DE
+ 37+  A49B C1                   POP     BC
+ 38+  A49C F1                   POP     AF
+ 39+  A49D C9                   RET
+ 40+  A49E
+ 41+  A49E              ; LimpiarTablero: Limpia el array Posiciones1.
+ 42+  A49E              LimpiarTablero:
+ 43+  A49E F5                   PUSH    AF
+ 44+  A49F C5                   PUSH    BC
+ 45+  A4A0 D5                   PUSH    DE
+ 46+  A4A1 DD E5                PUSH    IX
+ 47+  A4A3
+ 48+  A4A3 DD 21 9C 9B          LD      IX, Posiciones1
+ 49+  A4A7 06 06                LD      B, 6                    ; 6 filas
+ 50+  A4A9
+ 51+  A4A9              LimpiarFila:
+ 52+  A4A9 DD 36 00 FF          LD      (IX), $FF               ; Borde izquierdo
+ 53+  A4AD DD 36 01 00          LD      (IX+1), 0               ; Columna 0
+ 54+  A4B1 DD 36 02 00          LD      (IX+2), 0               ; Columna 1
+ 55+  A4B5 DD 36 03 00          LD      (IX+3), 0               ; Columna 2
+ 56+  A4B9 DD 36 04 00          LD      (IX+4), 0               ; Columna 3
+ 57+  A4BD DD 36 05 00          LD      (IX+5), 0               ; Columna 4
+ 58+  A4C1 DD 36 06 00          LD      (IX+6), 0               ; Columna 5
+ 59+  A4C5 DD 36 07 00          LD      (IX+7), 0               ; Columna 6
+ 60+  A4C9 DD 36 08 FF          LD      (IX+8), $FF             ; Borde derecho
+ 61+  A4CD 11 09 00             LD      DE, 9
+ 62+  A4D0 DD 19                ADD     IX, DE                  ; Siguiente fila (9 bytes)
+ 63+  A4D2 10 D5                DJNZ    LimpiarFila             ; Repetir para las 6 filas
+ 64+  A4D4
+ 65+  A4D4 DD E1                POP     IX
+ 66+  A4D6 D1                   POP     DE
+ 67+  A4D7 C1                   POP     BC
+ 68+  A4D8 F1                   POP     AF
+ 69+  A4D9 C9                   RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\juego1.asm
-115   A5A3                      INCLUDE "terminar.asm"
+138   A4DA                      INCLUDE "terminar.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\terminar.asm
-  1+  A5A3              ;para saber si el juego ha terminado mirar primera fila si hay 0. Las primeras 7 filas está claro
-  2+  A5A3              Tablero_lleno:
-  3+  A5A3 F5               push af
-  4+  A5A4 DD E5            push ix
-  5+  A5A6 C5               push bc
-  6+  A5A7
-  7+  A5A7 DD 21 C9 9B      ld ix, Posiciones1 +1
-  8+  A5AB 06 07            ld b,7
-  9+  A5AD              bucle_compurebo:
- 10+  A5AD DD 7E 00         ld a, (ix)
- 11+  A5B0 B7               or a
- 12+  A5B1 28 09            jr z, nolleno
- 13+  A5B3 DD 23            inc ix
- 14+  A5B5 10 F6            djnz bucle_compurebo
- 15+  A5B7                  ;si pasa por aquí está lleno
- 16+  A5B7 3E 01            ld a, 1
- 17+  A5B9 32 98 9B         ld(FullTablero), a
- 18+  A5BC              nolleno:
- 19+  A5BC C1               pop bc
- 20+  A5BD DD E1            pop ix
- 21+  A5BF F1               pop af
- 22+  A5C0 C9               ret
- 23+  A5C1
- 24+  A5C1              tamcolumna EQU 9
- 25+  A5C1
- 26+  A5C1              ; Entrada: H = fila (0-5), L = columna (0-6) donde cayo la ficha
- 27+  A5C1              ; Salida: Carry=1 si hay 4 en raya, Carry=0 si no
- 28+  A5C1              ; Si hay 4 en raya, pone Caracter='F' para que el juego pare
- 29+  A5C1              ; Usa Posiciones1 con bordes $FF como topes
- 30+  A5C1              Comprobar4enraya:
- 31+  A5C1 F5               push af
- 32+  A5C2 C5               push bc
- 33+  A5C3 D5               push de
- 34+  A5C4 E5               push hl
- 35+  A5C5 DD E5            push ix
- 36+  A5C7
- 37+  A5C7                  ; Usar SlotPointer_Array para calcular direccion en Posiciones1
- 38+  A5C7 CD A2 A6         call SlotPointer_Array   ; IX = direccion de la ficha en Posiciones1
- 39+  A5CA
- 40+  A5CA DD 4E 00         ld c, (ix)           ; C = color de la ficha (TINTA_Yel=6 o TINTA_Red=2)
- 41+  A5CD
- 42+  A5CD                  ; Guardar IX para restaurar en cada comprobacion
- 43+  A5CD DD E5            push ix
- 44+  A5CF
- 45+  A5CF                  ; 1) HORIZONTAL (izquierda <-> derecha): DE = 1
- 46+  A5CF 11 01 00         ld de, 1
- 47+  A5D2 CD 20 A6         call cb1
- 48+  A5D5 FE 04            cp 4
- 49+  A5D7 30 34            jr nc, hay_4enraya_pop
- 50+  A5D9
- 51+  A5D9                  ; 2) VERTICAL (arriba <-> abajo): DE = 9 (tamcolumna)
- 52+  A5D9 DD E1            pop ix
- 53+  A5DB DD E5            push ix
- 54+  A5DD 11 09 00         ld de, tamcolumna
- 55+  A5E0 CD 20 A6         call cb1
- 56+  A5E3 FE 04            cp 4
- 57+  A5E5 30 26            jr nc, hay_4enraya_pop
- 58+  A5E7
- 59+  A5E7                  ; 3) DIAGONAL \ (arriba-izq <-> abajo-der): DE = 10 (tamcolumna+1)
- 60+  A5E7 DD E1            pop ix
- 61+  A5E9 DD E5            push ix
- 62+  A5EB 11 0A 00         ld de, tamcolumna + 1
- 63+  A5EE CD 20 A6         call cb1
- 64+  A5F1 FE 04            cp 4
- 65+  A5F3 30 18            jr nc, hay_4enraya_pop
- 66+  A5F5
- 67+  A5F5                  ; 4) DIAGONAL / (arriba-der <-> abajo-izq): DE = 8 (tamcolumna-1)
- 68+  A5F5 DD E1            pop ix
- 69+  A5F7 DD E5            push ix
- 70+  A5F9 11 08 00         ld de, tamcolumna - 1
- 71+  A5FC CD 20 A6         call cb1
- 72+  A5FF FE 04            cp 4
- 73+  A601 30 0A            jr nc, hay_4enraya_pop
- 74+  A603
- 75+  A603                  ; No hay 4 en raya
- 76+  A603 DD E1            pop ix               ; limpiar stack
- 77+  A605 DD E1            pop ix
- 78+  A607 E1               pop hl
- 79+  A608 D1               pop de
- 80+  A609 C1               pop bc
- 81+  A60A F1               pop af
- 82+  A60B B7               or a                 ; Carry = 0
- 83+  A60C C9               ret
- 84+  A60D
- 85+  A60D              hay_4enraya_pop:
- 86+  A60D DD E1            pop ix               ; limpiar stack
- 87+  A60F              hay_4enraya:
- 88+  A60F                  ; Guardar color del ganador
- 89+  A60F 79               ld a, c              ; C tiene el color de la ficha ganadora
- 90+  A610 32 9A 9B         ld (Ganador), a
- 91+  A613
- 92+  A613 3E 46            ld a, 'F'
- 93+  A615 32 9C 9B         ld (Caracter), a
- 94+  A618 DD E1            pop ix
- 95+  A61A E1               pop hl
- 96+  A61B D1               pop de
- 97+  A61C C1               pop bc
- 98+  A61D F1               pop af
- 99+  A61E 37               scf                  ; Carry = 1
-100+  A61F C9               ret
-101+  A620
-102+  A620              ; Subrutina: Contar fichas consecutivas en ambas direcciones
-103+  A620              ; Entrada: IX = posicion central, C = color a buscar, DE = desplazamiento
-104+  A620              ; Salida: A = total de fichas consecutivas
-105+  A620              ; Los bordes $FF actuan como tope (nunca coinciden con color 2 o 6)
-106+  A620              cb1:
-107+  A620 DD E5            push ix              ; guardar posicion central
-108+  A622 06 01            ld b, 1              ; B = contador (1 por la ficha central)
-109+  A624 D5               push de              ; guardar DE
-110+  A625
-111+  A625                  ; Contar en direccion positiva (+DE)
-112+  A625              cb2_bucle1:
-113+  A625 DD 19            add ix, de
-114+  A627 DD 7E 00         ld a, (ix)           ; Leer casilla
-115+  A62A B9               cp c                 ; Es del mismo color? (si es $FF o 0 o diferente, para)
-116+  A62B 20 03            jr nz, cb1_seguir
-117+  A62D 04               inc b
-118+  A62E 18 F5            jr cb2_bucle1
-119+  A630
-120+  A630              cb1_seguir:
-121+  A630                  ; Restaurar para direccion negativa
-122+  A630 D1               pop de
-123+  A631 DD E1            pop ix
-124+  A633 DD E5            push ix
-125+  A635
-126+  A635                  ; Negar DE
-127+  A635 AF               xor a
-128+  A636 93               sub e
-129+  A637 5F               ld e, a
-130+  A638 3E 00            ld a, 0
-131+  A63A 9A               sbc a, d
-132+  A63B 57               ld d, a              ; DE = -DE
-133+  A63C
-134+  A63C                  ; Contar en direccion negativa
-135+  A63C              cb2_bucle2:
-136+  A63C DD 19            add ix, de
-137+  A63E DD 7E 00         ld a, (ix)           ; Leer casilla
-138+  A641 B9               cp c                 ; Es del mismo color?
-139+  A642 20 03            jr nz, cb1_fin
-140+  A644 04               inc b
-141+  A645 18 F5            jr cb2_bucle2
-142+  A647
-143+  A647              cb1_fin:
-144+  A647 DD E1            pop ix
-145+  A649 78               ld a, b              ; A = total
-146+  A64A C9               ret
-147+  A64B
-148+  A64B              ; Rutina: Mostrar resultado de la partida (centrado debajo de "La partida ha finalizado")
-149+  A64B              ; Muestra "Ganador: Amarillo", "Ganador: Rojo" o "Tablas" segun el valor de Ganador
-150+  A64B              MostrarResultado:
-151+  A64B F5               push af
-152+  A64C C5               push bc
-153+  A64D DD E5            push ix
-154+  A64F
-155+  A64F 3A 9A 9B         ld a, (Ganador)
-156+  A652
-157+  A652                  ; Comprobar si es amarillo (TINTA_Yel = 6)
-158+  A652 FE 06            cp TINTA_Yel
-159+  A654 28 13            jr z, MostrarAmarillo
-160+  A656
-161+  A656                  ; Comprobar si es rojo (TINTA_Red = 2)
-162+  A656 FE 02            cp TINTA_Red
-163+  A658 28 1E            jr z, MostrarRojo
-164+  A65A
-165+  A65A                  ; Si no es ninguno, son tablas (Ganador = 0)
-166+  A65A                  ; "Tablas" = 6 caracteres, centrado en columna (32-6)/2 = 13
-167+  A65A 06 03            ld b, 3              ; Fila 3 (debajo de "La partida ha finalizado" que esta en fila 1)
-168+  A65C 0E 0D            ld c, 13             ; Columna 13 (centrado)
-169+  A65E 3E 07            ld a, 7              ; Atributo blanco
-170+  A660 DD 21 91 9B      ld ix, M_TABLAS
-171+  A664 CD 64 9C         call PRINTAT
-172+  A667 18 1C            jr FinMostrarResultado
-173+  A669
-174+  A669              MostrarAmarillo:
-175+  A669                  ; "Ganador: Amarillo" = 17 caracteres, centrado en columna (32-17)/2 = 7
-176+  A669 06 03            ld b, 3              ; Fila 3
-177+  A66B 0E 07            ld c, 7              ; Columna 7 (centrado)
-178+  A66D 3E 06            ld a, TINTA_Yel      ; Atributo amarillo
-179+  A66F DD 21 71 9B      ld ix, M_GAN_AMARILLO
-180+  A673 CD 64 9C         call PRINTAT
-181+  A676 18 0D            jr FinMostrarResultado
-182+  A678
-183+  A678              MostrarRojo:
-184+  A678                  ; "Ganador: Rojo" = 13 caracteres, centrado en columna (32-13)/2 = 9
-185+  A678 06 03            ld b, 3              ; Fila 3
-186+  A67A 0E 09            ld c, 9              ; Columna 9 (centrado)
-187+  A67C 3E 02            ld a, TINTA_Red      ; Atributo rojo
-188+  A67E DD 21 83 9B      ld ix, M_GAN_ROJO
-189+  A682 CD 64 9C         call PRINTAT
-190+  A685
-191+  A685              FinMostrarResultado:
-192+  A685 DD E1            pop ix
-193+  A687 C1               pop bc
-194+  A688 F1               pop af
-195+  A689 C9               ret
+  1+  A4DA              ;Constantes y utilidades
+  2+  A4DA              tamcolumna      EQU 9
+  3+  A4DA
+  4+  A4DA              ;Tablero_lleno: Comprueba si el tablero está lleno
+  5+  A4DA              Tablero_lleno:
+  6+  A4DA F5                   PUSH    AF
+  7+  A4DB C5                   PUSH    BC
+  8+  A4DC DD E5                PUSH    IX
+  9+  A4DE
+ 10+  A4DE DD 21 9D 9B          LD      IX, Posiciones1 + 1     ; Saltar borde izquierdo
+ 11+  A4E2 06 07                LD      B, 7                    ; 7 columnas
+ 12+  A4E4
+ 13+  A4E4              bucle_compruebo:
+ 14+  A4E4 DD 7E 00             LD      A, (IX)
+ 15+  A4E7 B7                   OR      A                       ; Si es 0, hay hueco
+ 16+  A4E8 28 09                JR      Z, nolleno
+ 17+  A4EA DD 23                INC     IX
+ 18+  A4EC 10 F6                DJNZ    bucle_compruebo
+ 19+  A4EE
+ 20+  A4EE                      ; Si llega aqui, tablero lleno
+ 21+  A4EE 3E 01                LD      A, 1
+ 22+  A4F0 32 96 9B             LD      (FullTablero), A
+ 23+  A4F3
+ 24+  A4F3              nolleno:
+ 25+  A4F3 DD E1                POP     IX
+ 26+  A4F5 C1                   POP     BC
+ 27+  A4F6 F1                   POP     AF
+ 28+  A4F7 C9                   RET
+ 29+  A4F8
+ 30+  A4F8              ;Comprobar4enraya: Comprueba si hay 4 en raya
+ 31+  A4F8              Comprobar4enraya:
+ 32+  A4F8 F5                   PUSH    AF
+ 33+  A4F9 C5                   PUSH    BC
+ 34+  A4FA D5                   PUSH    DE
+ 35+  A4FB E5                   PUSH    HL
+ 36+  A4FC DD E5                PUSH    IX
+ 37+  A4FE
+ 38+  A4FE                      ; Calcular direccion en Posiciones1
+ 39+  A4FE CD DD A5             CALL    SlotPointer_Array       ; IX = direccion de la ficha
+ 40+  A501
+ 41+  A501 DD 4E 00             LD      C, (IX)                 ; C = color de la ficha
+ 42+  A504
+ 43+  A504 DD E5                PUSH    IX                      ; Guardar posicion central
+ 44+  A506
+ 45+  A506                      ; 1) HORIZONTAL (izquierda <-> derecha): DE = 1
+ 46+  A506 11 01 00             LD      DE, 1
+ 47+  A509 CD 57 A5             CALL    ContarFichasConsecutivas
+ 48+  A50C FE 04                CP      4
+ 49+  A50E 30 34                JR      NC, hay_4enraya_pop
+ 50+  A510
+ 51+  A510                      ; 2) VERTICAL (arriba <-> abajo): DE = 9
+ 52+  A510 DD E1                POP     IX
+ 53+  A512 DD E5                PUSH    IX
+ 54+  A514 11 09 00             LD      DE, tamcolumna
+ 55+  A517 CD 57 A5             CALL    ContarFichasConsecutivas
+ 56+  A51A FE 04                CP      4
+ 57+  A51C 30 26                JR      NC, hay_4enraya_pop
+ 58+  A51E
+ 59+  A51E                      ; 3) DIAGONAL (arriba-izq <-> abajo-der): DE = 10
+ 60+  A51E DD E1                POP     IX
+ 61+  A520 DD E5                PUSH    IX
+ 62+  A522 11 0A 00             LD      DE, tamcolumna + 1
+ 63+  A525 CD 57 A5             CALL    ContarFichasConsecutivas
+ 64+  A528 FE 04                CP      4
+ 65+  A52A 30 18                JR      NC, hay_4enraya_pop
+ 66+  A52C
+ 67+  A52C                      ; 4) DIAGONAL (arriba-der <-> abajo-izq): DE = 8
+ 68+  A52C DD E1                POP     IX
+ 69+  A52E DD E5                PUSH    IX
+ 70+  A530 11 08 00             LD      DE, tamcolumna - 1
+ 71+  A533 CD 57 A5             CALL    ContarFichasConsecutivas
+ 72+  A536 FE 04                CP      4
+ 73+  A538 30 0A                JR      NC, hay_4enraya_pop
+ 74+  A53A
+ 75+  A53A                      ; No hay 4 en raya
+ 76+  A53A DD E1                POP     IX                      ; Limpiar stack
+ 77+  A53C DD E1                POP     IX
+ 78+  A53E E1                   POP     HL
+ 79+  A53F D1                   POP     DE
+ 80+  A540 C1                   POP     BC
+ 81+  A541 F1                   POP     AF
+ 82+  A542 B7                   OR      A                       ; Carry = 0
+ 83+  A543 C9                   RET
+ 84+  A544
+ 85+  A544              hay_4enraya_pop:
+ 86+  A544 DD E1                POP     IX                      ; Limpiar stack
+ 87+  A546
+ 88+  A546              hay_4enraya:
+ 89+  A546                      ; Guarda color del ganador
+ 90+  A546 79                   LD      A, C
+ 91+  A547 32 98 9B             LD      (Ganador), A
+ 92+  A54A
+ 93+  A54A                      ; Marcar fin de juego
+ 94+  A54A 3E 46                LD      A, 'F'
+ 95+  A54C 32 9A 9B             LD      (Caracter), A
+ 96+  A54F
+ 97+  A54F DD E1                POP     IX
+ 98+  A551 E1                   POP     HL
+ 99+  A552 D1                   POP     DE
+100+  A553 C1                   POP     BC
+101+  A554 F1                   POP     AF
+102+  A555 37                   SCF                             ; Carry = 1
+103+  A556 C9                   RET
+104+  A557
+105+  A557              ;ContarFichasConsecutivas: Cuenta fichas consecutivas en ambas direcciones
+106+  A557              ContarFichasConsecutivas:
+107+  A557 DD E5                PUSH    IX                      ; Guardar posicion central
+108+  A559 D5                   PUSH    DE
+109+  A55A
+110+  A55A 06 01                LD      B, 1                    ; B = contador (1 por la ficha central)
+111+  A55C
+112+  A55C                      ; Contar en direccion positiva (+DE)
+113+  A55C              cb_positivo:
+114+  A55C DD 19                ADD     IX, DE
+115+  A55E DD 7E 00             LD      A, (IX)
+116+  A561 B9                   CP      C                       ; Es del mismo color?
+117+  A562 20 03                JR      NZ, cb_cambiar_dir
+118+  A564 04                   INC     B
+119+  A565 18 F5                JR      cb_positivo
+120+  A567
+121+  A567              cb_cambiar_dir:
+122+  A567                      ; Restaurar para direccion negativa
+123+  A567 D1                   POP     DE
+124+  A568 DD E1                POP     IX
+125+  A56A DD E5                PUSH    IX
+126+  A56C D5                   PUSH    DE
+127+  A56D
+128+  A56D                      ; Negar DE para direccion negativa: DE = -DE
+129+  A56D AF                   XOR     A
+130+  A56E 93                   SUB     E
+131+  A56F 5F                   LD      E, A
+132+  A570 3E 00                LD      A, 0
+133+  A572 9A                   SBC     A, D
+134+  A573 57                   LD      D, A
+135+  A574
+136+  A574                      ; Contar en direccion negativa (-DE)
+137+  A574              cb_negativo:
+138+  A574 DD 19                ADD     IX, DE
+139+  A576 DD 7E 00             LD      A, (IX)
+140+  A579 B9                   CP      C                       ; Es del mismo color?
+141+  A57A 20 03                JR      NZ, cb_fin
+142+  A57C 04                   INC     B
+143+  A57D 18 F5                JR      cb_negativo
+144+  A57F
+145+  A57F              cb_fin:
+146+  A57F D1                   POP     DE
+147+  A580 DD E1                POP     IX
+148+  A582 78                   LD      A, B                    ; A = total
+149+  A583 C9                   RET
+150+  A584
+151+  A584              ;MostrarResultado: Muestra el resultado de la partida
+152+  A584              MostrarResultado:
+153+  A584 F5                   PUSH    AF
+154+  A585 C5                   PUSH    BC
+155+  A586 DD E5                PUSH    IX
+156+  A588
+157+  A588 3A 98 9B             LD      A, (Ganador)
+158+  A58B
+159+  A58B                      ; Comprobar si es amarillo
+160+  A58B FE 06                CP      TINTA_Yel
+161+  A58D 28 13                JR      Z, MostrarAmarillo
+162+  A58F
+163+  A58F                      ; Comprobar si es rojo
+164+  A58F FE 02                CP      TINTA_Red
+165+  A591 28 1E                JR      Z, MostrarRojo
+166+  A593
+167+  A593                      ; Tablas (Ganador = 0)
+168+  A593 06 03                LD      B, 3                    ; Fila 3
+169+  A595 0E 0D                LD      C, 13                   ; Columna 13 (centrado)
+170+  A597 3E 07                LD      A, 7                    ; Atributo blanco
+171+  A599 DD 21 8F 9B          LD      IX, M_TABLAS
+172+  A59D CD 38 9C             CALL    PRINTAT
+173+  A5A0 18 1C                JR      FinMostrarResultado
+174+  A5A2
+175+  A5A2              MostrarAmarillo:
+176+  A5A2 06 03                LD      B, 3                    ; Fila 3
+177+  A5A4 0E 07                LD      C, 7                    ; Columna 7 (centrado)
+178+  A5A6 3E 06                LD      A, TINTA_Yel            ; Atributo amarillo
+179+  A5A8 DD 21 6F 9B          LD      IX, M_GAN_AMARILLO
+180+  A5AC CD 38 9C             CALL    PRINTAT
+181+  A5AF 18 0D                JR      FinMostrarResultado
+182+  A5B1
+183+  A5B1              MostrarRojo:
+184+  A5B1 06 03                LD      B, 3                    ; Fila 3
+185+  A5B3 0E 09                LD      C, 9                    ; Columna 9 (centrado)
+186+  A5B5 3E 02                LD      A, TINTA_Red            ; Atributo rojo
+187+  A5B7 DD 21 81 9B          LD      IX, M_GAN_ROJO
+188+  A5BB CD 38 9C             CALL    PRINTAT
+189+  A5BE
+190+  A5BE              FinMostrarResultado:
+191+  A5BE DD E1                POP     IX
+192+  A5C0 C1                   POP     BC
+193+  A5C1 F1                   POP     AF
+194+  A5C2 C9                   RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\terminar.asm
-116   A68A                     INCLUDE "slotpointer.asm"
+139   A5C3                      INCLUDE "slotpointer.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\slotpointer.asm
-  1+  A68A              SlotPointer: ;h fila, l columna y te devuelve coordenada de atributos
-  2+  A68A 7C               ld a,h
-  3+  A68B CB 27            sla a
-  4+  A68D CB 27            sla a
-  5+  A68F CB 27            sla a
-  6+  A691 CB 27            sla a
-  7+  A693 CB 27            sla a
-  8+  A695 B5               or L
-  9+  A696 6F               ld l,a
- 10+  A697 7C               ld a,h
- 11+  A698 CB 2F            sra a
- 12+  A69A CB 2F            sra a
- 13+  A69C CB 2F            sra a
- 14+  A69E F6 58            or $58
- 15+  A6A0 67               ld h,a
- 16+  A6A1 C9               ret
- 17+  A6A2
+  1+  A5C3              ;SlotPointer: Convierte fila/columna a dirección de atributos
+  2+  A5C3              SlotPointer:
+  3+  A5C3 C5                   PUSH    BC
+  4+  A5C4
+  5+  A5C4 7C                   LD      A, H                    ; A = fila
+  6+  A5C5 CB 27                SLA     A                       ; A = fila * 2
+  7+  A5C7 CB 27                SLA     A                       ; A = fila * 4
+  8+  A5C9 CB 27                SLA     A                       ; A = fila * 8
+  9+  A5CB CB 27                SLA     A                       ; A = fila * 16
+ 10+  A5CD CB 27                SLA     A                       ; A = fila * 32 (parte de offset)
+ 11+  A5CF B5                   OR      L                       ; Combinar con columna
+ 12+  A5D0 6F                   LD      L, A                    ; L = byte bajo de direccion
+ 13+  A5D1
+ 14+  A5D1 7C                   LD      A, H                    ; A = fila
+ 15+  A5D2 CB 2F                SRA     A                       ; A = fila / 2
+ 16+  A5D4 CB 2F                SRA     A                       ; A = fila / 4
+ 17+  A5D6 CB 2F                SRA     A                       ; A = fila / 8
+ 18+  A5D8 F6 58                OR      $58                     ; Base de atributos $5800
+ 19+  A5DA 67                   LD      H, A                    ; H = byte alto de direccion
+ 20+  A5DB
+ 21+  A5DB C1                   POP     BC
+ 22+  A5DC C9                   RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\slotpointer.asm
-117   A6A2                     INCLUDE "SlotPointer_PosicionesArray.asm"
+140   A5DD                      INCLUDE "SlotPointer_PosicionesArray.asm"
 # file opened: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\SlotPointer_PosicionesArray.asm
-  1+  A6A2              ; SlotPointer para el array Posiciones1
-  2+  A6A2              ; Similar a SlotPointer pero calcula la direccion en Posiciones1 en vez de atributos de pantalla
-  3+  A6A2              ; Entrada: H = fila (0-5), L = columna (0-6)
-  4+  A6A2              ; Salida: IX = direccion en Posiciones1
-  5+  A6A2              ; Modifica: A, DE, IX
-  6+  A6A2              SlotPointer_Array:
-  7+  A6A2 7C               ld a, h              ; A = fila
-  8+  A6A3 47               ld b, a              ; B = fila (guardar)
-  9+  A6A4
- 10+  A6A4                  ; fila * 9 = fila*8 + fila
- 11+  A6A4 CB 27            sla a                ; A = fila*2
- 12+  A6A6 CB 27            sla a                ; A = fila*4
- 13+  A6A8 CB 27            sla a                ; A = fila*8
- 14+  A6AA 80               add a, b             ; A = fila*9
- 15+  A6AB 85               add a, l             ; A = fila*9 + columna
- 16+  A6AC 3C               inc a                ; +1 por borde $FF izquierdo
- 17+  A6AD
- 18+  A6AD 5F               ld e, a
- 19+  A6AE 16 00            ld d, 0
- 20+  A6B0 DD 21 C8 9B      ld ix, Posiciones1
- 21+  A6B4 DD 19            add ix, de           ; IX = Posiciones1 + offset
- 22+  A6B6 C9               ret
- 23+  A6B7
+  1+  A5DD              ;SlotPointer_Array: Convierte fila/columna a posición en Posiciones1
+  2+  A5DD              SlotPointer_Array:
+  3+  A5DD C5                   PUSH    BC
+  4+  A5DE
+  5+  A5DE 7C                   LD      A, H                    ; A = fila
+  6+  A5DF 47                   LD      B, A                    ; B = fila (guardar)
+  7+  A5E0
+  8+  A5E0 CB 27                SLA     A                       ; A = fila * 2
+  9+  A5E2 CB 27                SLA     A                       ; A = fila * 4
+ 10+  A5E4 CB 27                SLA     A                       ; A = fila * 8
+ 11+  A5E6 80                   ADD     A, B                    ; A = fila * 9
+ 12+  A5E7 85                   ADD     A, L                    ; A = fila * 9 + columna
+ 13+  A5E8 3C                   INC     A                       ; +1 por borde $FF izquierdo
+ 14+  A5E9
+ 15+  A5E9 5F                   LD      E, A
+ 16+  A5EA 16 00                LD      D, 0
+ 17+  A5EC DD 21 9C 9B          LD      IX, Posiciones1
+ 18+  A5F0 DD 19                ADD     IX, DE                  ; IX = Posiciones1 + offset
+ 19+  A5F2
+ 20+  A5F2 C1                   POP     BC
+ 21+  A5F3 C9                   RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\SlotPointer_PosicionesArray.asm
-118   A6B7
-119   A6B7
-120   A6B7
-121   A6B7
-122   A6B7
-123   A6B7              SOLTAR_TECLA:
-124   A6B7 ED 78               IN A, (C)
-125   A6B9 E6 1F               AND $1F ;ASEGURA QUE LOS BITS DE A (0-7) LOS PRIMEROS 5 SON LOS Q NOS INTERESAN, ASEGURA QUE A VALGA %00011111
-126   A6BB FE 1F               CP $1F ;COMPRUEBA SI SE HA ESCRITO ALGO PORQUE SI VALE 1F SIGNIFICA QUE NO SE HA PULSADO TECLAS
-127   A6BD 20 F8               JR NZ, SOLTAR_TECLA ;SI Z=0 (ES DECIR, A ES DISTINTO DE $1F), LA TECLA SIGUE PULSADA ENTONCES BUCLE HASTA QUE EL USUARIO LA SUELTE
-128   A6BF C9                  RET
-129   A6C0
-130   A6C0
-131   A6C0
-132   A6C0
-133   A6C0
-134   A6C0
-135   A6C0              LEER_SN:
-136   A6C0 C5                  PUSH BC
-137   A6C1              SN_0:
-138   A6C1 01 FE FD            LD BC, $FDFE ;'S' en D1
-139   A6C4 ED 78               IN A, (C)
-140   A6C6 CB 4F               BIT 1, A
-141   A6C8 20 0B               JR NZ, SN_1
-142   A6CA CD B7 A6            CALL SOLTAR_TECLA
-143   A6CD 3E 53               LD A, 'S'
-144   A6CF CD D5 9C            CALL CLEARSCR
-145   A6D2                     ;Z=1
-146   A6D2 AF                  XOR A
-147   A6D3 C1                  POP BC
-148   A6D4 C9                  RET
-149   A6D5
-150   A6D5              SN_1:
-151   A6D5 01 FE 7F            LD BC, $7FFE ;'N' en D3
-152   A6D8 ED 78               IN A, (C)
-153   A6DA CB 5F               BIT 3, A
-154   A6DC 20 E3               JR NZ, SN_0
-155   A6DE CD B7 A6            CALL SOLTAR_TECLA
-156   A6E1 3E 4E               LD A, 'N'
-157   A6E3 CD D5 9C            CALL CLEARSCR
-158   A6E6 3E 00               LD A, 0
-159   A6E8 D3 FE               OUT ($FE), A
-160   A6EA CD D5 9C            CALL CLEARSCR
-161   A6ED 06 0C               LD B, 12
-162   A6EF 0E 0C               LD C, 12
-163   A6F1 3E 50               LD A, 0+2*8+64
-164   A6F3 DD 21 2D 9B         LD IX, M_GB
-165   A6F7 CD 64 9C            CALL PRINTAT
-166   A6FA                     ;Z=0
-167   A6FA 3E 01               LD A, 1
-168   A6FC B7                  OR A
-169   A6FD C1                  POP BC
-170   A6FE C9                  RET
+141   A5F4
+142   A5F4
+143   A5F4
+144   A5F4
+145   A5F4
+146   A5F4              ;SOLTAR_TECLA: Espera a que se suelten todas las teclas
+147   A5F4              SOLTAR_TECLA:
+148   A5F4 F5                   PUSH    AF
+149   A5F5              SOLTAR_TECLA_LOOP:
+150   A5F5 ED 78                IN      A, (C)
+151   A5F7 E6 1F                AND     $1F                     ; Máscara bits 0-4 (teclas)
+152   A5F9 FE 1F                CP      $1F                     ; $1F = ninguna tecla pulsada
+153   A5FB 20 F8                JR      NZ, SOLTAR_TECLA_LOOP   ; Si hay tecla, esperar
+154   A5FD F1                   POP     AF
+155   A5FE C9                   RET
+156   A5FF              ;LEER_SN: Lee 'S' o 'N' del teclado
+157   A5FF              LEER_SN:
+158   A5FF C5                   PUSH    BC
+159   A600 D5                   PUSH    DE
+160   A601 E5                   PUSH    HL
+161   A602 DD E5                PUSH    IX
+162   A604
+163   A604              SN_0:
+164   A604 01 FE FD             LD      BC, $FDFE
+165   A607 ED 78                IN      A, (C)                  ; Leer puerto $FDFE
+166   A609 CB 4F                BIT     1, A                    ; Comprobar tecla 'S'
+167   A60B 20 0F                JR      NZ, SN_1                ; No pulsada, probar 'N'
+168   A60D
+169   A60D CD F4 A5             CALL    SOLTAR_TECLA            ; Tecla 'S' pulsada
+170   A610 3E 53                LD      A, 'S'
+171   A612 CD A9 9C             CALL    CLEARSCR
+172   A615 AF                   XOR     A                       ; Z=1 (afirmativo)
+173   A616
+174   A616 DD E1                POP     IX
+175   A618 E1                   POP     HL
+176   A619 D1                   POP     DE
+177   A61A C1                   POP     BC
+178   A61B C9                   RET
+179   A61C
+180   A61C              SN_1:
+181   A61C 01 FE 7F             LD      BC, $7FFE
+182   A61F ED 78                IN      A, (C)                  ; Leer puerto $7FFE
+183   A621 CB 5F                BIT     3, A                    ; Comprobar tecla 'N'
+184   A623 20 DF                JR      NZ, SN_0                ; No pulsada, volver a 'S'
+185   A625
+186   A625 CD F4 A5             CALL    SOLTAR_TECLA            ; Tecla 'N' pulsada
+187   A628 3E 4E                LD      A, 'N'
+188   A62A CD A9 9C             CALL    CLEARSCR
+189   A62D 3E 00                LD      A, 0
+190   A62F D3 FE                OUT     ($FE), A                ; Borde negro
+191   A631 CD A9 9C             CALL    CLEARSCR
+192   A634
+193   A634 06 0C                LD      B, 12                   ; Fila 12
+194   A636 0E 0C                LD      C, 12                   ; Columna 12
+195   A638 3E 50                LD      A, 0+2*8+64             ; Atributo: rojo, bright
+196   A63A DD 21 2D 9B          LD      IX, M_GB
+197   A63E CD 38 9C             CALL    PRINTAT                 ; Mostrar "Adios!!!!"
+198   A641
+199   A641 3E 01                LD      A, 1
+200   A643 B7                   OR      A                       ; Z=0 (negativo)
+201   A644
+202   A644 DD E1                POP     IX
+203   A646 E1                   POP     HL
+204   A647 D1                   POP     DE
+205   A648 C1                   POP     BC
+206   A649 C9                   RET
 # file closed: C:\Users\mario\.vscode\Workspace\Arquitectura Computadores\Rutina bienvenida 4 en raya\main.asm

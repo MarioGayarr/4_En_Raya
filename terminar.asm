@@ -1,195 +1,194 @@
-;para saber si el juego ha terminado mirar primera fila si hay 0. Las primeras 7 filas está claro
+;Constantes y utilidades
+tamcolumna      EQU 9
+
+;Tablero_lleno: Comprueba si el tablero está lleno
 Tablero_lleno:
-    push af
-    push ix 
-    push bc
-    
-    ld ix, Posiciones1 +1
-    ld b,7
-bucle_compurebo:
-    ld a, (ix)
-    or a 
-    jr z, nolleno
-    inc ix 
-    djnz bucle_compurebo
-    ;si pasa por aquí está lleno
-    ld a, 1
-    ld(FullTablero), a
+        PUSH    AF
+        PUSH    BC
+        PUSH    IX
+        
+        LD      IX, Posiciones1 + 1     ; Saltar borde izquierdo
+        LD      B, 7                    ; 7 columnas
+
+bucle_compruebo:
+        LD      A, (IX)
+        OR      A                       ; Si es 0, hay hueco
+        JR      Z, nolleno
+        INC     IX 
+        DJNZ    bucle_compruebo
+        
+        ; Si llega aqui, tablero lleno
+        LD      A, 1
+        LD      (FullTablero), A
+
 nolleno:
-    pop bc
-    pop ix
-    pop af
-    ret 
+        POP     IX
+        POP     BC
+        POP     AF
+        RET 
 
-tamcolumna EQU 9
-
-; Entrada: H = fila (0-5), L = columna (0-6) donde cayo la ficha
-; Salida: Carry=1 si hay 4 en raya, Carry=0 si no
-; Si hay 4 en raya, pone Caracter='F' para que el juego pare
-; Usa Posiciones1 con bordes $FF como topes
+;Comprobar4enraya: Comprueba si hay 4 en raya
 Comprobar4enraya:
-    push af
-    push bc
-    push de
-    push hl
-    push ix
-    
-    ; Usar SlotPointer_Array para calcular direccion en Posiciones1
-    call SlotPointer_Array   ; IX = direccion de la ficha en Posiciones1
-    
-    ld c, (ix)           ; C = color de la ficha (TINTA_Yel=6 o TINTA_Red=2)
-    
-    ; Guardar IX para restaurar en cada comprobacion
-    push ix
-    
-    ; 1) HORIZONTAL (izquierda, derecha): DE = 1
-    ld de, 1
-    call cb1
-    cp 4
-    jr nc, hay_4enraya_pop
-    
-    ; 2) VERTICAL (arriba, abajo): DE = 9 (tamcolumna)
-    pop ix
-    push ix
-    ld de, tamcolumna
-    call cb1
-    cp 4
-    jr nc, hay_4enraya_pop
-    
-    ; 3) DIAGONAL (arriba-izq, abajo-der): DE = 10 (tamcolumna+1)
-    pop ix
-    push ix
-    ld de, tamcolumna + 1
-    call cb1
-    cp 4
-    jr nc, hay_4enraya_pop
-    
-    ; 4) DIAGONAL (arriba-der <-> abajo-izq): DE = 8 (tamcolumna-1)
-    pop ix
-    push ix
-    ld de, tamcolumna - 1
-    call cb1
-    cp 4
-    jr nc, hay_4enraya_pop
-    
-    ; No hay 4 en raya
-    pop ix               ; limpiar stack
-    pop ix
-    pop hl
-    pop de
-    pop bc
-    pop af
-    or a                 ; Carry = 0
-    ret
+        PUSH    AF
+        PUSH    BC
+        PUSH    DE
+        PUSH    HL
+        PUSH    IX
+        
+        ; Calcular direccion en Posiciones1
+        CALL    SlotPointer_Array       ; IX = direccion de la ficha
+        
+        LD      C, (IX)                 ; C = color de la ficha
+        
+        PUSH    IX                      ; Guardar posicion central
+        
+        ; 1) HORIZONTAL (izquierda <-> derecha): DE = 1
+        LD      DE, 1
+        CALL    ContarFichasConsecutivas
+        CP      4
+        JR      NC, hay_4enraya_pop
+        
+        ; 2) VERTICAL (arriba <-> abajo): DE = 9
+        POP     IX
+        PUSH    IX
+        LD      DE, tamcolumna
+        CALL    ContarFichasConsecutivas
+        CP      4
+        JR      NC, hay_4enraya_pop
+        
+        ; 3) DIAGONAL (arriba-izq <-> abajo-der): DE = 10
+        POP     IX
+        PUSH    IX
+        LD      DE, tamcolumna + 1
+        CALL    ContarFichasConsecutivas
+        CP      4
+        JR      NC, hay_4enraya_pop
+        
+        ; 4) DIAGONAL (arriba-der <-> abajo-izq): DE = 8
+        POP     IX
+        PUSH    IX
+        LD      DE, tamcolumna - 1
+        CALL    ContarFichasConsecutivas
+        CP      4
+        JR      NC, hay_4enraya_pop
+        
+        ; No hay 4 en raya
+        POP     IX                      ; Limpiar stack
+        POP     IX
+        POP     HL
+        POP     DE
+        POP     BC
+        POP     AF
+        OR      A                       ; Carry = 0
+        RET
 
 hay_4enraya_pop:
-    pop ix               ; limpiar stack
+        POP     IX                      ; Limpiar stack
+
 hay_4enraya:
-    ; Guardar color del ganador
-    ld a, c              ; C tiene el color de la ficha ganadora
-    ld (Ganador), a      ; Guardar ganador
-    
-    ld a, 'F'
-    ld (Caracter), a
-    pop ix
-    pop hl
-    pop de
-    pop bc
-    pop af
-    scf                  ; Carry = 1
-    ret
+        ; Guarda color del ganador
+        LD      A, C
+        LD      (Ganador), A
+        
+        ; Marcar fin de juego
+        LD      A, 'F'
+        LD      (Caracter), A
+        
+        POP     IX
+        POP     HL
+        POP     DE
+        POP     BC
+        POP     AF
+        SCF                             ; Carry = 1
+        RET
 
-; Subrutina: Contar fichas consecutivas en ambas direcciones
-; Entrada: IX = posicion central, C = color a buscar, DE = desplazamiento
-; Salida: A = total de fichas consecutivas
-; Los bordes $FF actuan como tope (nunca coinciden con color 2 o 6)
-cb1:
-    push ix              ; guardar posicion central
-    ld b, 1              ; B = contador (1 por la ficha central)
-    push de              ; guardar DE
-    
-    ; Contar en direccion positiva (+DE)
-cb2_bucle1:
-    add ix, de
-    ld a, (ix)           ; Leer casilla
-    cp c                 ; Es del mismo color? (si es $FF o 0 o diferente, para)
-    jr nz, cb1_seguir
-    inc b
-    jr cb2_bucle1
-    
-cb1_seguir:
-    ; Restaurar para direccion negativa
-    pop de
-    pop ix
-    push ix
-    
-    ; Negar DE para contar en direccion negativa
-    xor a
-    sub e
-    ld e, a
-    ld a, 0
-    sbc a, d
-    ld d, a              ; DE = -DE
-    
-    ; Contar en direccion negativa
-cb2_bucle2:
-    add ix, de
-    ld a, (ix)           ; Leer casilla
-    cp c                 ; Es del mismo color?
-    jr nz, cb1_fin
-    inc b
-    jr cb2_bucle2
-    
-cb1_fin:
-    pop ix
-    ld a, b              ; A = total
-    ret
+;ContarFichasConsecutivas: Cuenta fichas consecutivas en ambas direcciones
+ContarFichasConsecutivas:
+        PUSH    IX                      ; Guardar posicion central
+        PUSH    DE
+        
+        LD      B, 1                    ; B = contador (1 por la ficha central)
+        
+        ; Contar en direccion positiva (+DE)
+cb_positivo:
+        ADD     IX, DE
+        LD      A, (IX)
+        CP      C                       ; Es del mismo color?
+        JR      NZ, cb_cambiar_dir
+        INC     B
+        JR      cb_positivo
+        
+cb_cambiar_dir:
+        ; Restaurar para direccion negativa
+        POP     DE
+        POP     IX
+        PUSH    IX
+        PUSH    DE
+        
+        ; Negar DE para direccion negativa: DE = -DE
+        XOR     A
+        SUB     E
+        LD      E, A
+        LD      A, 0
+        SBC     A, D
+        LD      D, A
+        
+        ; Contar en direccion negativa (-DE)
+cb_negativo:
+        ADD     IX, DE
+        LD      A, (IX)
+        CP      C                       ; Es del mismo color?
+        JR      NZ, cb_fin
+        INC     B
+        JR      cb_negativo
+        
+cb_fin:
+        POP     DE
+        POP     IX
+        LD      A, B                    ; A = total
+        RET
 
-; Rutina: Mostrar resultado de la partida (centrado debajo de "La partida ha finalizado")
-; Muestra "Ganador: Amarillo", "Ganador: Rojo" o "Tablas" segun el valor de Ganador
+;MostrarResultado: Muestra el resultado de la partida
 MostrarResultado:
-    push af
-    push bc
-    push ix
-    
-    ld a, (Ganador)
-    
-    ; Comprobar si es amarillo (TINTA_Yel = 6)
-    cp TINTA_Yel
-    jr z, MostrarAmarillo
-    
-    ; Comprobar si es rojo (TINTA_Red = 2)
-    cp TINTA_Red
-    jr z, MostrarRojo
-    
-    ; Si no es ninguno, son tablas (Ganador = 0)
-    ; "Tablas" = 6 caracteres, centrado en columna (32-6)/2 = 13
-    ld b, 3              ; Fila 3 (debajo de "La partida ha finalizado" que esta en fila 1)
-    ld c, 13             ; Columna 13 (centrado)
-    ld a, 7              ; Atributo blanco
-    ld ix, M_TABLAS
-    call PRINTAT
-    jr FinMostrarResultado
-    
+        PUSH    AF
+        PUSH    BC
+        PUSH    IX
+        
+        LD      A, (Ganador)
+        
+        ; Comprobar si es amarillo
+        CP      TINTA_Yel
+        JR      Z, MostrarAmarillo
+        
+        ; Comprobar si es rojo
+        CP      TINTA_Red
+        JR      Z, MostrarRojo
+        
+        ; Tablas (Ganador = 0)
+        LD      B, 3                    ; Fila 3
+        LD      C, 13                   ; Columna 13 (centrado)
+        LD      A, 7                    ; Atributo blanco
+        LD      IX, M_TABLAS
+        CALL    PRINTAT
+        JR      FinMostrarResultado
+        
 MostrarAmarillo:
-    ; "Ganador: Amarillo" = 17 caracteres, centrado en columna (32-17)/2 = 7
-    ld b, 3              ; Fila 3
-    ld c, 7              ; Columna 7 (centrado)
-    ld a, TINTA_Yel      ; Atributo amarillo
-    ld ix, M_GAN_AMARILLO
-    call PRINTAT
-    jr FinMostrarResultado
-    
+        LD      B, 3                    ; Fila 3
+        LD      C, 7                    ; Columna 7 (centrado)
+        LD      A, TINTA_Yel            ; Atributo amarillo
+        LD      IX, M_GAN_AMARILLO
+        CALL    PRINTAT
+        JR      FinMostrarResultado
+        
 MostrarRojo:
-    ; "Ganador: Rojo" = 13 caracteres, centrado en columna (32-13)/2 = 9
-    ld b, 3              ; Fila 3
-    ld c, 9              ; Columna 9 (centrado)
-    ld a, TINTA_Red      ; Atributo rojo
-    ld ix, M_GAN_ROJO
-    call PRINTAT
-    
+        LD      B, 3                    ; Fila 3
+        LD      C, 9                    ; Columna 9 (centrado)
+        LD      A, TINTA_Red            ; Atributo rojo
+        LD      IX, M_GAN_ROJO
+        CALL    PRINTAT
+        
 FinMostrarResultado:
-    pop ix
-    pop bc
-    pop af
-    ret
+        POP     IX
+        POP     BC
+        POP     AF
+        RET
