@@ -1,4 +1,4 @@
-;SlotPointer: Convierte fila/columna a dirección de atributos
+;SlotPointer: Convierte fila/columna a dirección de atributos hl> $5800, código proporcionado en clase.
 SlotPointer:
         PUSH    BC
         

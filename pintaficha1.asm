@@ -327,7 +327,11 @@ Fin_Ficha:
         POP     HL
         RET
 
-; PintaCuadrao: Pinta cuadrado 3x2 con color del usuario.
+; PintaCuadrao: Pinta cuadrado 3x2 con color del usuario con un hl(zona atributos).
+; realmente es un duplicado de la segunda parte de PintaCuadrao1 porque solo rellena un bloque 3x2 de atributos en pantalla
+; (HL ya apunta a la zona de atributos) y no aplica la lógica de coordenadas lógicas ni el papel azul por fila.
+; Se mantiene aquí para que FICHA pueda asegurar que los atributos del área donde dibuja el bitmap queden al color del jugador
+; sin adaptar su flujo a PintaCuadrao1. Para nosotros era muy lioso ya hacer esta adaptación después de todas las que hemos ido teniendo que hacer.
 PintaCuadrao:
         LD      A, (Color_Usuario)
         JR      SEGUIR
@@ -363,10 +367,10 @@ SEGUIR:
         RET
 
 ; Datos: Variables de posición de ficha.
-ColumnaFinal:   DB 0                    ; Columna donde cayo la ficha (0-6)
-FilaFinal:      DB 0                    ; Fila donde cayo la ficha (0-5)
+ColumnaFinal:   DB 0                    ; Columna donde cayo la ficha (0-6), luego la usamos para comprobaciones
+FilaFinal:      DB 0                    ; Fila donde cayo la ficha (0-5) al final de la animación
 
-; Animacion_Caeficha: Anima caída y actualiza estado del juego.
+; Animacion_Caeficha: Anima caída(excepto columna llena) y actualiza estado del juego.
 Animacion_Caeficha:
         PUSH    AF
         PUSH    BC
@@ -397,9 +401,9 @@ BuscarHueco:
         JR      Z, HuecoEncontrado      ; Sí, usar este
 
         ADD     IX, DE                  ; Subir 1 fila
-        DJNZ    BuscarHueco             ; Repetir
+        DJNZ    BuscarHueco             ; Repetir, si b llega a 0 significa que está arriba del todo y que la columna está llena
 
-        JR      ColumnaLlena            ; No hay hueco
+        JR      ColumnaLlena            ; No hay hueco, sata
 
 HuecoEncontrado:
         LD      A, (Color_Usuario)      ; Guardar color en array
@@ -441,7 +445,7 @@ TerminaAnimacion:
         JR      Z, Animacion_Fin        ; Sí, salir
         
         LD      A, (ContadorFichas)
-        CP      42                      ; ¿Tablero lleno?
+        CP      42                      ; ¿Tablero lleno?, por esto hemos cambiado la rutina que teníamos previamebte de comprobacíon de tablero lleno.El contador nos parecía más simple.
         JR      NZ, Animacion_Fin       ; No, salir normal
         
         LD      A, 'F'                  ; Sí, marcar fin (tablas)
@@ -456,7 +460,7 @@ Animacion_Fin:
 
 ; ColumnaLlena: Marca columna llena.
 ColumnaLlena:
-        LD      A, 1                    ; Marcar columna llena
+        LD      A, 1                    ; Marcar columna llena poninendo Columna full a 1
         LD      (ColumnaFull), A
         POP     IX
         POP     DE
@@ -464,7 +468,7 @@ ColumnaLlena:
         POP     AF
         RET
 
-; PintaCuadrao1: Pinta 3x2 en coordenadas del tablero.
+; PintaCuadrao1: Pinta 3x2 en coordenadas del tablero, Este es el verdadero slot pointer implementado en pintar directamente(Hecho por Marco en el hackathon con ayuda de Jose Manuel).
 PintaCuadrao1:
         LD      A, H
         OR      A                       ; ¿Fila 0?
@@ -479,7 +483,7 @@ COLOR_SUPERIOR:
 
 ; BORRAR_FICHA1: Borra 3x2 en coordenadas del tablero.
 BORRAR_FICHA1:
-        LD      A, H
+        LD      A, H                    ;compruebo si es arriba del tablero(h=0)
         OR      A                       ; ¿Fila 0?
         JR      Z, BORRAR_SUPERIOR      ; Sí, atributo 0
         LD      A, PAPEL_Azul + TINTA_Blck
@@ -494,7 +498,7 @@ SEGUIR1:
         PUSH    BC
         PUSH    AF                      ; Guardar atributo
 
-        ; Convertir coordenadas logicas a posicion de atributos
+        ; Convertir coordenadas logicas a posicion de atributos, el verdadero slotpointer
         ; H = H*3 + 1 (fila de caracteres)
         LD      B, A                    ; Guardar atributo en B
         LD      A, H
@@ -510,9 +514,8 @@ SEGUIR1:
         INC     A 
         LD      L, A
         
-        CALL    SlotPointer             ; HL = direccion de atributos
-
-        ; Pintar cuadrado 3x2
+        CALL    SlotPointer             ; vuelve a conseguir en HL la coord de atributos, HL>$5800
+        ; Pintar cuadrado 3x2, que es el duplicado de PintaCuadrao
         LD      A, B                    ; Recuperar atributo
         LD      (HL), A
         INC     HL
@@ -533,7 +536,7 @@ SEGUIR1:
         POP     HL
         RET
 
-; ESPERAR: Retardo para animación de fichas.
+; ESPERAR: Retardo para animación de fichas, código proporcionado en clase.
 ESPERAR: 
         PUSH    BC 
         LD      B, 50

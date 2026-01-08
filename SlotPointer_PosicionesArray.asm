@@ -1,4 +1,6 @@
 ;SlotPointer_Array: Convierte fila/columna a posición en Posiciones1
+;éste no sirve para pintar en pantalla, en Seguir1 también se hace un cáculo de la posición en tablero pero usando
+;el cambio a hl
 SlotPointer_Array:
         PUSH    BC
         

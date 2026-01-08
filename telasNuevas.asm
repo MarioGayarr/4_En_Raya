@@ -226,7 +226,7 @@ nohaycambio:
         
         ; Esperar un momento para que se vea
         LD      BC, $8000               ; Retardo
-retardo_aviso:
+retardo_aviso: ;para el mensaje de columna llena
         DEC     BC
         LD      A, B
         OR      C

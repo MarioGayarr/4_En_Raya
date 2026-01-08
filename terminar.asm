@@ -1,32 +1,5 @@
 ;Constantes y utilidades
 tamcolumna      EQU 9
-
-;Tablero_lleno: Comprueba si el tablero está lleno
-Tablero_lleno:
-        PUSH    AF
-        PUSH    BC
-        PUSH    IX
-        
-        LD      IX, Posiciones1 + 1     ; Saltar borde izquierdo
-        LD      B, 7                    ; 7 columnas
-
-bucle_compruebo:
-        LD      A, (IX)
-        OR      A                       ; Si es 0, hay hueco
-        JR      Z, nolleno
-        INC     IX 
-        DJNZ    bucle_compruebo
-        
-        ; Si llega aqui, tablero lleno
-        LD      A, 1
-        LD      (FullTablero), A
-
-nolleno:
-        POP     IX
-        POP     BC
-        POP     AF
-        RET 
-
 ;Comprobar4enraya: Comprueba si hay 4 en raya
 Comprobar4enraya:
         PUSH    AF

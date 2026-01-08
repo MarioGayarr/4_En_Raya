@@ -98,7 +98,7 @@ JUGAR_NUEVAMENTE:
         LD      A, 6*8+128
         LD      ($5800+12*32+30), A     ; Marcar cursor
         
-        CALL    LEER_SN                 ; Esperar respuesta S/N
+        CALL    LEER_SN                 ; Esperar respuesta S/N, con pantalla inicial
         JR      NZ, fin                 ; Si N, terminar
         
         CALL    JUEGO                   ; Nueva partida
@@ -139,7 +139,7 @@ LEER_SN:
         PUSH    DE
         PUSH    HL
         PUSH    IX
-
+;directamente del código proporcionado
 SN_0: 
         LD      BC, $FDFE
         IN      A, (C)                  
